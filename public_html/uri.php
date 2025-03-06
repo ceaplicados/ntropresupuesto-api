@@ -1,6 +1,6 @@
 <?php 
 header('Content-Type: application/json; charset=utf-8');
-
+header('Access-Control-Allow-Origin: *');
 $_uris=array();
 
 $request_uri=$_SERVER["REQUEST_URI"];

@@ -1,0 +1,16 @@
+[
+    {
+        "dataset": "/Estados",
+        "descripcion": "Catálogo de los estados de la república mexicana",
+        "version": 1,
+        "lastUpdate": "2025-01-01",
+        "fuentes": "SAT"
+    },
+    {
+        "dataset": "/INPC",
+        "descripcion": "Valores anuales del INPC",
+        "version": 1,
+        "lastUpdate": "2025-01-01",
+        "fuentes": "INEGI, y Paquete Económico 2025"
+    }
+]
