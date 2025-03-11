@@ -1,0 +1,12 @@
+{
+    "name": "NuestroPresupuestoAPI",
+    "version": "0.1",
+    "description": "API para consumo de la app de #NuestroPresupuesto",
+    "main": "index.js",
+    "license": "GPL-3.0-only",
+    "author": "Centro de Estudios Aplicados",
+    "dependencies": {
+        "express": "^4.21.2",
+        "nodemon": "^3.1.9"
+    }
+}
