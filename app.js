@@ -1,9 +1,12 @@
-const fs = require('fs').promises;
-const express = require ('express');
-const estados = require('./src/routers/estados.js')
+import express from 'express';
+import fs from 'fs/promises';
+import routerEstados from './src/routers/estados.js'
+import estados from './src/services/Estados.js'
 
 const app = express();
 app.use(express.json());
+
+const codigosEstados = estados.estados.map((estado) => {return "/"+estado.Codigo});
 
 app.get("/Datos",(req,res)=>{
     fs.readFile("./api/Datos.json","utf8")
@@ -42,7 +45,7 @@ app.get("/INPC",(req,res)=>{
     res.end;
 });
 
-app.use(/^\/[A-Z]{3}[A-Z]?(\/[a-zA-Z]{3})?$/, estados);
+app.use(codigosEstados, routerEstados);
 
 const PORT=5001;
 app.listen(PORT,()=>console.log("Server is running"));

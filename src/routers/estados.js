@@ -1,18 +1,25 @@
-const express = require('express');
+import express from 'express';
+import estados from '../services/Estados.js';
+import versionesPresupuesto from './versionesPresupuesto.js';
+import URs from './URs.js';
+
 const router = express.Router();
-const estados= require('../services/Estados.js');
-let estado=null;
-let url=null;
+
+let url=[];
+let estado={};
 
 router.use("/*",(req,res,next)=>{
+
     url=req.baseUrl.split("/");
     if(url[0]===""){
         url.shift();
     }
     if(url.length>0){
-        estado=estados.filter((estado) => {return estado.Codigo===url[0]});
+        estado=estados.estados.filter((estado) => {return estado.Codigo===url[0]});
         if(estado.length>0){
             estado=estado[0];
+            res.locals.estado=estado;
+            res.locals.url=url;
             next();
         }else{
             res.status(500).json({message: "Código de estado erróneo"});
@@ -24,12 +31,7 @@ router.use("/*",(req,res,next)=>{
     }
 });
 
-router.get("/",(req,res)=>{
-    res.status(200).json({estado: estado});
-});
+router.use("/", versionesPresupuesto);
+router.use("/URs", URs);
 
-router.get("/URs",(req,res)=>{
-    res.status(200).json({estado: estado});
-});
-
-module.exports=router;
+export default router;

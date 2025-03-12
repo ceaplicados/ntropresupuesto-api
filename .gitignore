@@ -1,4 +1,6 @@
 *.code-workspace
+config/config.env
+
 # Logs
 logs
 *.log

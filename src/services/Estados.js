@@ -1,4 +1,4 @@
-let estados = [
+const estados = [
     {"Id" :1, "Nombre" : "Aguascalientes", "Codigo" : "AGS"},
     {"Id" :2, "Nombre" : "Baja California", "Codigo" : "BC"},
     {"Id" :3, "Nombre" : "Baja California Sur", "Codigo" : "BCS"},
@@ -33,4 +33,4 @@ let estados = [
     {"Id" :32, "Nombre" : "Zacatecas", "Codigo" : "ZAC"}
 ]
 
-module.exports=estados;
+export default {estados};
