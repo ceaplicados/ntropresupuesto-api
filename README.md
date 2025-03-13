@@ -12,10 +12,10 @@ Serie de valores anuales del Índica Nacional de Precios al Consumidor de acuerd
 Catálogo de Estados con su Nombre y su código de abreviación
 
 ## Datos federales
-### /Presupuesto
+### /Federal/Presupuesto
 Histórico del presupuesto federal, a valores corrientes. Fuente: [Transparencia Presupuestaria](https://www.transparenciapresupuestaria.gob.mx/).
 
-### /GastoFederalizado
+### /Federal/GastoFederalizado
 Histórico del total del gasto federalizado agrupado en Participaciones, Aportaciones, Convenios y Subsidios. Fuente: [Transparencia Presupuestaria](https://www.transparenciapresupuestaria.gob.mx/).
 
 ## Estados

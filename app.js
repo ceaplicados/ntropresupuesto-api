@@ -1,9 +1,14 @@
 import express from 'express';
+import cors from 'cors';
 import fs from 'fs/promises';
+import compression from 'compression';
 import routerEstados from './src/routers/estados.js'
+import routerFederal from './src/routers/federal.js'
 import estados from './src/services/Estados.js'
 
 const app = express();
+app.use(cors());
+app.use(compression());
 app.use(express.json());
 
 const codigosEstados = estados.estados.map((estado) => {return "/"+estado.Codigo});
@@ -45,6 +50,7 @@ app.get("/INPC",(req,res)=>{
     res.end;
 });
 
+app.use('/Federal', routerFederal);
 app.use(codigosEstados, routerEstados);
 
 const PORT=5001;
