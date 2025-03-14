@@ -2,6 +2,7 @@ import express from 'express';
 import estados from '../services/Estados.js';
 import versionesPresupuesto from './versionesPresupuesto.js';
 import URs from './URs.js';
+import UPs from './UPs.js';
 
 const router = express.Router();
 
@@ -33,5 +34,6 @@ router.use("/*",(req,res,next)=>{
 
 router.use("/", versionesPresupuesto);
 router.use("/URs", URs);
+router.use("/UPs", UPs);
 
 export default router;

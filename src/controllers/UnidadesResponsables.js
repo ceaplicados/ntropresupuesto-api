@@ -19,6 +19,7 @@ export default class UnidadesResponsables {
                 unidadResponsable.Nombre=row.Nombre;
                 unidadResponsable.UnidadPresupuestal=row.UnidadPresupuestal;
                 unidadResponsable.OtrosNombres=row.OtrosNombres;
+                delete unidadResponsable.Monto;
                 return unidadResponsable;
             });
             return result;
