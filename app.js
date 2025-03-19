@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import fs from 'fs/promises';
 import compression from 'compression';
+import routerAuth from './src/routers/auth.js'
 import routerEstados from './src/routers/estados.js'
 import routerFederal from './src/routers/federal.js'
 import estados from './src/services/Estados.js'
@@ -52,6 +53,7 @@ app.get("/INPC",(req,res)=>{
 
 app.use('/Federal', routerFederal);
 app.use(codigosEstados, routerEstados);
+app.use('/auth', routerAuth);
 
 const PORT=5001;
 app.listen(PORT,()=>console.log("Server is running"));
