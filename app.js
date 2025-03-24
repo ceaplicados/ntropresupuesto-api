@@ -1,5 +1,6 @@
 import express from 'express';
 import cors from 'cors';
+import whitelist from './config/cors.js'
 import fs from 'fs/promises';
 import jwt from 'jsonwebtoken';
 import session from 'express-session';
@@ -13,7 +14,6 @@ import dotenv from 'dotenv';
 dotenv.config({ path: './config/config.env' });
 
 const app = express();
-const whitelist = ['http://localhost', 'http://localhost:5173']
 app.use(cors({
     origin: whitelist,
     credentials: true,

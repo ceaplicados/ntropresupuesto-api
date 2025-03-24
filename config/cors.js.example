@@ -1,0 +1,6 @@
+const estados = [
+    'http://localhost', 
+    'http://localhost:5173'
+]
+
+export default {estados};
