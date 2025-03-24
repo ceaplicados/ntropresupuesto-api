@@ -1,6 +1,6 @@
-const estados = [
+const whitelist = [
     'http://localhost', 
     'http://localhost:5173'
 ]
 
-export default {estados};
+export default {whitelist};
