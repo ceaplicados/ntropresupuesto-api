@@ -1,18 +1,48 @@
 import express from 'express';
 import cors from 'cors';
 import fs from 'fs/promises';
+import jwt from 'jsonwebtoken';
+import session from 'express-session';
 import compression from 'compression';
 import routerAuth from './src/routers/auth.js'
 import routerEstados from './src/routers/estados.js'
 import routerFederal from './src/routers/federal.js'
+import routerUser from './src/routers/User.js'
 import estados from './src/services/Estados.js'
+import dotenv from 'dotenv';
+dotenv.config({ path: './config/config.env' });
 
 const app = express();
-app.use(cors());
+const whitelist = ['http://localhost', 'http://localhost:5173']
+app.use(cors({
+    origin: whitelist,
+    credentials: true,
+    optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204
+  }));
 app.use(compression());
 app.use(express.json());
+app.use(session({secret: process.env.SESSION_SECRET,resave:true,saveUninitialized:true}));
 
 const codigosEstados = estados.estados.map((estado) => {return "/"+estado.Codigo});
+const loginRequired = ["/Cuadernos/User","/User"]
+app.use(loginRequired,function auth(req, res, next) {
+    // Check if user is logged in and has valid access token
+    if (req.headers['authorization']) {
+        const authHeader = req.headers['authorization'];
+        const token = authHeader.split(' ')[1];
+        // Verify JWT token
+        jwt.verify(token, process.env.SESSION_SECRET, (err, decoded) => {
+            if (!err) {
+                req.user = decoded.user;
+                next(); // Proceed to the next middleware
+            } else {
+                return res.status(403).json({ message: "User not authenticated" });
+            }
+        });
+    } else {
+        return res.status(403).json({ message: "User not logged in" });
+    }
+})
 
 app.get("/Datos",(req,res)=>{
     fs.readFile("./api/Datos.json","utf8")
@@ -54,6 +84,7 @@ app.get("/INPC",(req,res)=>{
 app.use('/Federal', routerFederal);
 app.use(codigosEstados, routerEstados);
 app.use('/auth', routerAuth);
+app.use('/User', routerUser);
 
 const PORT=5001;
 app.listen(PORT,()=>console.log("Server is running"));
