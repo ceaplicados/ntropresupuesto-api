@@ -86,5 +86,5 @@ app.use(codigosEstados, routerEstados);
 app.use('/auth', routerAuth);
 app.use('/User', routerUser);
 
-const PORT=5001;
+const PORT=process.env.APP_PORT;
 app.listen(PORT,()=>console.log("Server is running"));
