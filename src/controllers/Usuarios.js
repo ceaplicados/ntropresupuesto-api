@@ -63,6 +63,7 @@ export default class Usuarios {
                 usuario.Sobrenombre = row.Sobrenombre
                 usuario.Email = row.Email
                 usuario.Password = row.Password
+                usuario.Telefono = row.Telefono
                 usuario.Estado = row.Estado
                 if(row.Activo===0){
                     usuario.Activo=false
@@ -105,6 +106,7 @@ export default class Usuarios {
                 usuario.Apellidos = row.Apellidos
                 usuario.Sobrenombre = row.Sobrenombre
                 usuario.Email = row.Email
+                usuario.Telefono = row.Telefono
                 usuario.Password = row.Password
                 usuario.Estado = row.Estado
                 if(row.Activo===0){
@@ -132,7 +134,7 @@ export default class Usuarios {
 
     async update (usuario) {
         try {
-            let query='UPDATE `Usuarios` SET `Nombre` = ?, `Apellidos` = ?, `Sobrenombre` = ?, `Image` = ?, `GoogleId` = ?, `Estado` = ?, `Email` = ? WHERE `Id` = ?';
+            let query='UPDATE `Usuarios` SET `Nombre` = ?, `Apellidos` = ?, `Sobrenombre` = ?, `Image` = ?, `GoogleId` = ?, `Estado` = ?, `Email` = ?, `Telefono` = ? WHERE `Id` = ?';
             let params=[
                 usuario.Nombre,
                 usuario.Apellidos,
@@ -141,6 +143,7 @@ export default class Usuarios {
                 usuario.GoogleId,
                 usuario.Estado,
                 usuario.Email,
+                usuario.Telefono,
                 usuario.Id
             ];
             

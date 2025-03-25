@@ -6,6 +6,7 @@ export default class Usuario{
         this.Apellidos = null
         this.Sobrenombre = null
         this.Email = null
+        this.Telefono = null
         this.Password = null
         this.Estado = null
         this.Activo = true

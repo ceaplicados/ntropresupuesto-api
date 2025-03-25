@@ -30,3 +30,10 @@ Listado histórico de todas las Unidades Responsables en el estado.
 
 ### /CÓDIGO-DEL-ESTADO/URs/Presupuesto?{v=VERSION_DEL_PRESUPUESTO,a=AÑO_DEL_PRESUPUESTO}
 Presupuesto agrupado por Unidad Responsable a pesos corrientes, por default arroja la última versión disponible. Se puede especificar el año deseado (a) o la versión del presupuesto (v) como variables de la URL.
+
+## Cuadernos
+### /Cuadernos
+Listado de los cuadernos de trabajo públicos
+
+### /Cuadernos/User
+Listado de los cuadernos de trabajo del usuario autenticado
