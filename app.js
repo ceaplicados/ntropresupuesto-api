@@ -9,6 +9,7 @@ import routerAuth from './src/routers/auth.js'
 import routerEstados from './src/routers/estados.js'
 import routerFederal from './src/routers/federal.js'
 import routerUser from './src/routers/User.js'
+import routerCuadernos from './src/routers/cuadernos.js'
 import estados from './src/services/Estados.js'
 import dotenv from 'dotenv';
 dotenv.config({ path: './config/config.env' });
@@ -85,6 +86,7 @@ app.use('/Federal', routerFederal);
 app.use(codigosEstados, routerEstados);
 app.use('/auth', routerAuth);
 app.use('/User', routerUser);
+app.use('/Cuadernos', routerCuadernos);
 
 const PORT=process.env.APP_PORT;
 app.listen(PORT,()=>console.log("Server is running"));
