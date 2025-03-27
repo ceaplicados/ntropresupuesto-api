@@ -1,5 +1,7 @@
 import connection from '../../config/db.conf.js';
 import Usuario from '../models/Usuario.js';
+import { v4 as uuidv4 } from 'uuid';
+
 export default class Usuarios {
     async getByEmail (email) {
         let usuario=new Usuario();
@@ -151,6 +153,37 @@ export default class Usuarios {
                 query,
                 params)            
 
+            return usuario;
+        } catch (err) {
+            console.log(err);
+        }
+    }
+
+    async create (usuario) {
+        try {
+            let DateBorn=new Date()
+            usuario.DateBorn=DateBorn.toISOString().replace(/T/, ' ').replace(/\..+/, '');
+            usuario.UUID=uuidv4();
+            let query='INSERT INTO `Usuarios` (`UUID`, `Nombre`, `Apellidos`, `Sobrenombre`, `Image`, `GoogleId`, `Estado`, `Email`, `Telefono`, `DateBorn`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);';
+            let params=[
+                usuario.UUID,
+                usuario.Nombre,
+                usuario.Apellidos,
+                usuario.Sobrenombre,
+                usuario.Image,
+                usuario.GoogleId,
+                usuario.Estado,
+                usuario.Email,
+                usuario.Telefono,
+                usuario.DateBorn
+            ];
+            
+            const [results] = await connection.query(
+                query,
+                params)            
+            
+            console.log(results);
+            usuario.Id=results.insertId;
             return usuario;
         } catch (err) {
             console.log(err);

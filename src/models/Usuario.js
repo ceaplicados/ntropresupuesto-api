@@ -14,5 +14,6 @@ export default class Usuario{
         this.Image = null
         this.GoogleId = null
         this.Admin = false
+        this.DateBorn = null
     }
 }

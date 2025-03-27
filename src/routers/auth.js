@@ -2,6 +2,7 @@ import express from 'express';
 import jwt from 'jsonwebtoken';
 import Google_Auth from '../services/Google_Auth.js';
 import Usuarios from '../controllers/Usuarios.js';
+import Usuario from '../models/Usuario.js';
 
 const router = express.Router();
 const usuarios=new Usuarios();
@@ -40,8 +41,7 @@ router.post("/Google",(req,res) => {
                     if(usuario.Id){
                         compararUsuario(usuario,payload);
                     }else{
-                        // Dar de alta
-                        res.status(500).json({message: 'Usuario no encontrado'})
+                        crearUsuario(payload);
                     }
                 },
                 (error) => res.status(500).json({message: 'Error al consultar la BDD'})
@@ -50,7 +50,7 @@ router.post("/Google",(req,res) => {
 
     // verificar si es necesario actualizar los datos del usuario
     const compararUsuario = (usuario,payload) => {
-        if(payload['sub']!==usuario.GoogleId || payload['email']!==usuario.Email || payload['given_name']!==usuario.Nombre || payload['givefamily_namen_name']!==usuario.Apellidos || usuario.picture===null){
+        if(payload['sub']!==usuario.GoogleId || payload['email']!==usuario.Email || payload['given_name']!==usuario.Nombre || payload['family_name']!==usuario.Apellidos || usuario.picture===null){
             usuario.GoogleId=payload['sub'];
             usuario.Email=payload['email'];
             usuario.Nombre=payload['given_name'];
@@ -68,6 +68,24 @@ router.post("/Google",(req,res) => {
         }else{
             iniciarSesion(usuario);
         }
+    }
+
+    // verificar si es necesario actualizar los datos del usuario
+    const crearUsuario = (payload) => {
+        let usuario=new Usuario();
+        usuario.Nombre=payload['given_name'];
+        usuario.Apellidos=payload['family_name'];
+        usuario.Sobrenombre=payload['given_name'];
+        usuario.Email=payload['email'];
+        usuario.Image=payload['picture'];
+        usuario.GoogleId=payload['sub'];
+        usuarios.create(usuario)
+        .then(
+            (usuario) => {
+                iniciarSesion(usuario);
+            },
+            (error)  => res.status(500).json({message: 'Error al consultar la BDD'})
+        )
     }
 
     // iniciar sesión
