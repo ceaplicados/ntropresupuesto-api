@@ -28,16 +28,23 @@ export default class UnidadesResponsables {
         }
     };
 
-    async showMontosByVersionPresupuesto (idVersion) {
+    async showMontosByVersionPresupuesto (idVersion,idUnidadResponsable) {
         let result=[];
         try {
-            const [results] = await connection.query(
-                'SELECT UnidadResponsable.*,CONCAT(UnidadPresupuestal.Clave,"-",UnidadResponsable.Clave) AS ClaveCompleta, SUM(Monto) AS Monto FROM ObjetoDeGasto '
-                    +' JOIN UnidadResponsable ON UnidadResponsable.Id=ObjetoDeGasto.UnidadResponsable'
-                    +' JOIN UnidadPresupuestal ON UnidadPresupuestal.Id=UnidadResponsable.UnidadPresupuestal'
-                    +' WHERE ObjetoDeGasto.VersionPresupuesto=?'
-                    +' GROUP BY ObjetoDeGasto.UnidadResponsable ',
-                [idVersion])
+            let query = 'SELECT UnidadResponsable.*,CONCAT(UnidadPresupuestal.Clave,"-",UnidadResponsable.Clave) AS ClaveCompleta, SUM(Monto) AS Monto FROM ObjetoDeGasto '
+                query +=' JOIN UnidadResponsable ON UnidadResponsable.Id=ObjetoDeGasto.UnidadResponsable'
+                query +=' JOIN UnidadPresupuestal ON UnidadPresupuestal.Id=UnidadResponsable.UnidadPresupuestal'
+                query +=' WHERE ObjetoDeGasto.VersionPresupuesto= ? '
+            let params = [idVersion];
+
+            if (idUnidadResponsable) {
+                query += ' AND ObjetoDeGasto.UnidadResponsable=?';
+                params.push(idUnidadResponsable);
+            }
+            
+            query += ' GROUP BY UnidadResponsable.Id ';
+            
+            const [results] = await connection.query(query,params)
             result=results.map((row) => {
                 let unidadResponsable=new UnidadResponsable();
                 unidadResponsable.Id=row.Id;

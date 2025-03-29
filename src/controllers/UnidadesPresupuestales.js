@@ -29,7 +29,6 @@ export default class UnidadesPresupuestales {
 
     async showMontosByVersionPresupuesto (idVersion,idUnidadPresupuestal) {
         let result=[];
-        console.log(idVersion,idUnidadPresupuestal);
         try {
             let query = "SELECT `UnidadPresupuestal`.*, SUM(`Monto`) AS Monto FROM `UnidadPresupuestal` "
             query+=" JOIN `UnidadResponsable` ON `UnidadPresupuestal`.`Id`=`UnidadResponsable`.`UnidadPresupuestal`"
@@ -37,12 +36,12 @@ export default class UnidadesPresupuestales {
             query+=" WHERE `VersionPresupuesto`= ?";
             
             let params=[idVersion];
+            
             if(idUnidadPresupuestal){
                 query+=" AND UnidadPresupuestal.Id=? "
                 params.push(idUnidadPresupuestal);
             }
             query+=" GROUP BY `UnidadPresupuestal`.`Id`;";
-            console.log(query,params);
             
             const [results] = await connection.query(query,params)
             
@@ -55,7 +54,8 @@ export default class UnidadesPresupuestales {
                 unidadPresupuestal.Monto=row.Monto;
                 unidadPresupuestal.UnidadesResponsables=row.UnidadesResponsables;
                 return unidadPresupuestal;
-                });
+            });
+            
         }catch (err) {
             console.log(err);
         }

@@ -182,7 +182,6 @@ export default class Usuarios {
                 query,
                 params)            
             
-            console.log(results);
             usuario.Id=results.insertId;
             return usuario;
         } catch (err) {

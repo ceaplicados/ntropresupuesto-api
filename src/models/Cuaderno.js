@@ -12,5 +12,7 @@ export default class Cuaderno{
         this.Anios = []
         this.Renglones = []
         this.Usuarios = []
+        this.VersionesPresupuesto = []
+        this.Datos = []
     }
 }

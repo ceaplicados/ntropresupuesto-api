@@ -26,6 +26,8 @@ app.use(session({secret: process.env.SESSION_SECRET,resave:true,saveUninitialize
 
 const codigosEstados = estados.estados.map((estado) => {return "/"+estado.Codigo});
 const loginRequired = ["/Cuadernos/User","/User"]
+const loginOptional = ['/Cuadernos/:cuadernoId([0-9]+)']
+
 app.use(loginRequired,function auth(req, res, next) {
     // Check if user is logged in and has valid access token
     if (req.headers['authorization']) {
@@ -43,6 +45,21 @@ app.use(loginRequired,function auth(req, res, next) {
     } else {
         return res.status(403).json({ message: "User not logged in" });
     }
+})
+
+app.use(loginOptional,function auth(req, res, next) {
+    // Check if user is logged in and has valid access token
+    if (req.headers['authorization']) {
+        const authHeader = req.headers['authorization'];
+        const token = authHeader.split(' ')[1];
+        // Verify JWT token
+        jwt.verify(token, process.env.SESSION_SECRET, (err, decoded) => {
+            if (!err) {
+                req.user = decoded.user;
+            }
+        });
+    }
+    next(); // Proceed to the next middleware
 })
 
 app.get("/Datos",(req,res)=>{
