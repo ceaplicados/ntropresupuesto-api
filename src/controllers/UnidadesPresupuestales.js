@@ -26,4 +26,39 @@ export default class UnidadesPresupuestales {
             console.log(err);
         }
     };
+
+    async showMontosByVersionPresupuesto (idVersion,idUnidadPresupuestal) {
+        let result=[];
+        console.log(idVersion,idUnidadPresupuestal);
+        try {
+            let query = "SELECT `UnidadPresupuestal`.*, SUM(`Monto`) AS Monto FROM `UnidadPresupuestal` "
+            query+=" JOIN `UnidadResponsable` ON `UnidadPresupuestal`.`Id`=`UnidadResponsable`.`UnidadPresupuestal`"
+            query+=" JOIN `ObjetoDeGasto` ON `UnidadResponsable`.`Id` =  `ObjetoDeGasto`.`UnidadResponsable` "
+            query+=" WHERE `VersionPresupuesto`= ?";
+            
+            let params=[idVersion];
+            if(idUnidadPresupuestal){
+                query+=" AND UnidadPresupuestal.Id=? "
+                params.push(idUnidadPresupuestal);
+            }
+            query+=" GROUP BY `UnidadPresupuestal`.`Id`;";
+            console.log(query,params);
+            
+            const [results] = await connection.query(query,params)
+            
+                result=results.map((row) => {
+                let unidadPresupuestal=new UnidadPresupuestal();
+                unidadPresupuestal.Id=row.Id;
+                unidadPresupuestal.Clave=row.Clave;
+                unidadPresupuestal.Nombre=row.Nombre;
+                unidadPresupuestal.Estado=row.Estado;
+                unidadPresupuestal.Monto=row.Monto;
+                unidadPresupuestal.UnidadesResponsables=row.UnidadesResponsables;
+                return unidadPresupuestal;
+                });
+        }catch (err) {
+            console.log(err);
+        }
+        return result;
+    }
 }
