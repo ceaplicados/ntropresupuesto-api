@@ -45,12 +45,16 @@ export default class VersionesPresupuesto {
         }
     }
 
-    async showByEstado (idEstado) {
+    async showByEstado (idEstado,anios) {
         let result=[];
         try {
-            const [results] = await connection.query(
-                'SELECT * FROM `VersionesPresupuesto` WHERE `Estado` = ? ORDER BY Anio,Fecha',
-                [idEstado])
+            let query='SELECT * FROM `VersionesPresupuesto` WHERE `Estado` = ? ORDER BY Anio,Fecha';
+            let params=[idEstado];
+            if(anios){
+                query = 'SELECT * FROM `VersionesPresupuesto` WHERE `Estado` = ? AND Anio IN (?) AND Actual=1 ORDER BY Anio,Fecha';
+                params = [idEstado,anios];
+            }
+            const [results] = await connection.query(query,params)
             result=results.map((row) => {
                 let versionPresupuesto=new VersionPresupuesto();
                 versionPresupuesto.Id=row.Id;
@@ -124,4 +128,19 @@ export default class VersionesPresupuesto {
             console.log(err);
         }
     };
+
+    async getTotal (idVersion) {
+        let total=0;
+        try {
+            let query='SELECT SUM(`Monto`) AS Total FROM `ObjetoDeGasto` WHERE `VersionPresupuesto` =  ?';
+            let params=[idVersion];
+            const [results] = await connection.query(
+                query,
+                params)
+            total=results[0].Total;
+        } catch (err) {
+            console.log(err);
+        }
+        return total;
+    }
 }
