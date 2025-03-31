@@ -3,6 +3,9 @@ import estados from '../services/Estados.js';
 import versionesPresupuesto from './versionesPresupuesto.js';
 import URs from './URs.js';
 import UPs from './UPs.js';
+import CapituloGasto from './CapituloGasto.js';
+import ConceptosGenerales from './ConceptosGenerales.js';
+import PartidasGenericas from './PartidasGenericas.js';
 
 const router = express.Router();
 
@@ -35,5 +38,8 @@ router.use("/*",(req,res,next)=>{
 router.use("/", versionesPresupuesto);
 router.use("/URs", URs);
 router.use("/UPs", UPs);
+router.use("/CapituloGasto", CapituloGasto);
+router.use("/ConceptosGenerales", ConceptosGenerales);
+router.use("/PartidasGenericas", PartidasGenericas);
 
 export default router;
