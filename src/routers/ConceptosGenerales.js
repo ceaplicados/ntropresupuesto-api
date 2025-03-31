@@ -52,24 +52,43 @@ router.get("/",(req,res) => {
         (error) => res.status(500).json({message: 'Error al consultar la BDD'})
     )
 })
-router.get("/:ClaveConceptoGeneral",(req,res) => {
-    conceptosGenerales.getByVersion(versionPresupuesto.Id,req.params.ClaveConceptoGeneral)
-    .then(
-        (value) => {
-            if(value.Clave){
+router.get("/:Filtro",(req,res) => {
+    let filtro=req.params.Filtro;
+    const exCapituloGasto=/^[1-9]000$/;
+    
+    if(exCapituloGasto.test(filtro)){
+        // Filtro por capítulo de gasto
+        conceptosGenerales.getByVersionCapituloGasto(versionPresupuesto.Id,filtro)
+        .then(
+            (value) => {
                 res.status(200).json({
                     versionPresupuesto: versionPresupuesto,
                     presupuesto: value
                 })
-            }else{
-                res.status(404).json({
-                    message: "Concepto general no encontrado"
-                })
-            }
-            
-        },
-        (error) => res.status(500).json({message: 'Error al consultar la BDD'})
-    )
+                
+            },
+            (error) => res.status(500).json({message: 'Error al consultar la BDD'})
+        )
+    }else{
+        // Filtro por concepto general
+        conceptosGenerales.getByVersion(versionPresupuesto.Id,filtro)
+        .then(
+            (value) => {
+                if(value.Clave){
+                    res.status(200).json({
+                        versionPresupuesto: versionPresupuesto,
+                        presupuesto: value
+                    })
+                }else{
+                    res.status(404).json({
+                        message: "Concepto general no encontrado"
+                    })
+                }
+                
+            },
+            (error) => res.status(500).json({message: 'Error al consultar la BDD'})
+        )
+    }
 })
 
 export default router;

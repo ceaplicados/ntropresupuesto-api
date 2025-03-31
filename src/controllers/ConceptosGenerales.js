@@ -15,7 +15,7 @@ export default class ConceptosGenerales {
             params.push(claveConceptoGeneral);
         }
 
-        query+='GROUP BY `ConceptosGenerales`.`Id`;';
+        query+='GROUP BY `ConceptosGenerales`.`Id` ORDER BY `ConceptosGenerales`.`Clave`;';
         
         try {
             const [results] = await connection.query(query, params);
@@ -33,6 +33,33 @@ export default class ConceptosGenerales {
         }
         if(result.length==1){
             result=result[0];
+        }
+        return result;
+    }
+
+    async getByVersionCapituloGasto (idVersion,claveCapituloGasto) {
+        let result=[];
+        let query='SELECT `ConceptosGenerales`.*, SUM(`Monto`) AS Monto FROM `ConceptosGenerales` '
+        query+='JOIN `CapitulosGasto` ON `ConceptosGenerales`.`CapituloGasto` =  `CapitulosGasto`.`Id` '
+        query+='JOIN `PartidasGenericas` ON `ConceptosGenerales`.`Id` =  `PartidasGenericas`.`ConceptoGeneral` '
+        query+='JOIN `ObjetoDeGasto` ON `PartidasGenericas`.`Id` =  `ObjetoDeGasto`.`PartidaGenerica` '
+        query+='WHERE `VersionPresupuesto`= ?  AND `CapitulosGasto`.`Clave` = ? ';
+        query+='GROUP BY `ConceptosGenerales`.`Id` ORDER BY `ConceptosGenerales`.`Clave`;';
+        let params = [idVersion,claveCapituloGasto]; 
+                       
+        try {
+            const [results] = await connection.query(query, params);
+            result = results.map((row) => {
+                let conceptoGeneral = new ConceptoGeneral();
+                delete conceptoGeneral.Id;
+                conceptoGeneral.Clave = row.Clave;
+                conceptoGeneral.Nombre = row.Nombre;
+                conceptoGeneral.Monto = row.Monto;
+                delete conceptoGeneral.CapituloGasto;
+                return conceptoGeneral;
+            });
+        } catch (err) {
+            console.log(err);
         }
         return result;
     }

@@ -38,19 +38,19 @@ Presupuesto agrupado por Unidad Responsable a pesos corrientes, por default arro
 Presupuesto agrupado por Capítulo de Gasto a pesos corrientes, por default arroja la última versión disponible. Se puede especificar el año deseado (a) o la versión del presupuesto (v) como variables de la URL.
 
 ### GET /CÓDIGO-DEL-ESTADO/CapituloGasto/:ClaveCapituloGasto?{v=VERSION_DEL_PRESUPUESTO,a=AÑO_DEL_PRESUPUESTO}
-Presupuesto para el Capítulo de Gasto especificado a pesos corrientes, por default arroja la última versión disponible. Se puede especificar el año deseado (a) o la versión del presupuesto (v) como variables de la URL.
+Presupuesto a pesos corrientes para el Capítulo de Gasto especificado, por default arroja la última versión disponible. Se puede especificar el año deseado (a) o la versión del presupuesto (v) como variables de la URL.
 
 ### GET /CÓDIGO-DEL-ESTADO/ConceptosGenerales?{v=VERSION_DEL_PRESUPUESTO,a=AÑO_DEL_PRESUPUESTO}
 Presupuesto agrupado por Conceptos Generales a pesos corrientes, por default arroja la última versión disponible. Se puede especificar el año deseado (a) o la versión del presupuesto (v) como variables de la URL.
 
-### GET /CÓDIGO-DEL-ESTADO/ConceptosGenerales/:ClaveConceptoGeneral?{v=VERSION_DEL_PRESUPUESTO,a=AÑO_DEL_PRESUPUESTO}
-Presupuesto para el Concepto General especificado a pesos corrientes, por default arroja la última versión disponible. Se puede especificar el año deseado (a) o la versión del presupuesto (v) como variables de la URL.
+### GET /CÓDIGO-DEL-ESTADO/ConceptosGenerales/:Filtro?{v=VERSION_DEL_PRESUPUESTO,a=AÑO_DEL_PRESUPUESTO}
+Presupuesto agrupado por Conceptos Generales a pesos corrientes para el filtro especificado, el cual puede ser la clave de un Concepto General o de un Capítulo de Gasto, por default arroja la última versión disponible. Se puede especificar el año deseado (a) o la versión del presupuesto (v) como variables de la URL.
 
 ### GET /CÓDIGO-DEL-ESTADO/PartidasGenericas?{v=VERSION_DEL_PRESUPUESTO,a=AÑO_DEL_PRESUPUESTO}
 Presupuesto agrupado por PartidasGenericas a pesos corrientes, por default arroja la última versión disponible. Se puede especificar el año deseado (a) o la versión del presupuesto (v) como variables de la URL.
 
-### GET /CÓDIGO-DEL-ESTADO/PartidasGenericas/:ClaveConceptoGeneral?{v=VERSION_DEL_PRESUPUESTO,a=AÑO_DEL_PRESUPUESTO}
-Presupuesto para la Partida Generica especificada a pesos corrientes, por default arroja la última versión disponible. Se puede especificar el año deseado (a) o la versión del presupuesto (v) como variables de la URL.
+### GET /CÓDIGO-DEL-ESTADO/PartidasGenericas/:Filtro?{v=VERSION_DEL_PRESUPUESTO,a=AÑO_DEL_PRESUPUESTO}
+Presupuesto agrupado por PartidasGenericas a pesos corrientes para el filtro especificado, el cual puede ser la clave de una Partida Genérica, Concepto General o de un Capítulo de Gasto, por default arroja la última versión disponible. Se puede especificar el año deseado (a) o la versión del presupuesto (v) como variables de la URL.
 
 ## Cuadernos
 ### GET /Cuadernos
