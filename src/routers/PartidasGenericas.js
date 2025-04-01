@@ -48,6 +48,7 @@ router.get("/:Filtro",(req,res) => {
             (error) => res.status(500).json({message: 'Error al consultar la BDD'})
         )
     }else{
+        // filtrar por partida genérica
         partidasGenericas.getByVersion(res.locals.versionPresupuesto.Id,filtro)
         .then(
             (value) => {
@@ -58,7 +59,7 @@ router.get("/:Filtro",(req,res) => {
                     })
                 }else{
                     res.status(404).json({
-                        message: "Concepto general no encontrado"
+                        message: "Partida genérica no encontrada"
                     })
                 }
                 

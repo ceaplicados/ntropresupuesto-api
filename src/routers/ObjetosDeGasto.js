@@ -49,7 +49,7 @@ router.get("/:Filtro",(req,res) => {
             (error) => res.status(500).json({message: 'Error al consultar la BDD'})
         )
     }else if(exPartidaGenerica.test(filtro)){
-        // Filtro por capítulo de gasto
+        // Filtro por partida genérica
         objetosDeGasto.getByVersionPartidaGenerica(res.locals.versionPresupuesto.Id,filtro)
         .then(
             (value) => {
@@ -62,6 +62,7 @@ router.get("/:Filtro",(req,res) => {
             (error) => res.status(500).json({message: 'Error al consultar la BDD'})
         )
     }else{
+        // Filtro por objeto de gasto
         objetosDeGasto.getByVersion(res.locals.versionPresupuesto.Id,filtro)
         .then(
             (value) => {
@@ -72,7 +73,7 @@ router.get("/:Filtro",(req,res) => {
                     })
                 }else{
                     res.status(404).json({
-                        message: "Concepto general no encontrado"
+                        message: "Objeto de gasto no encontrado"
                     })
                 }
                 

@@ -34,6 +34,12 @@ Listado histórico de todas las Unidades Responsables en el estado.
 ### GET /CÓDIGO-DEL-ESTADO/URs/Presupuesto?{v=VERSION_DEL_PRESUPUESTO,a=AÑO_DEL_PRESUPUESTO}
 Presupuesto agrupado por Unidad Responsable a pesos corrientes, por default arroja la última versión disponible. Se puede especificar el año deseado (a) o la versión del presupuesto (v) como variables de la URL.
 
+### GET /CÓDIGO-DEL-ESTADO/URs/Presupuesto/:ClaveUnidadResponsable?{v=VERSION_DEL_PRESUPUESTO,a=AÑO_DEL_PRESUPUESTO}
+Presupuesto agrupado por Unidad Responsable a pesos corrientes para la Unidad Responsable definida en :ClaveUnidadResponsable, por default arroja la última versión disponible. Se puede especificar el año deseado (a) o la versión del presupuesto (v) como variables de la URL.
+
+### GET /CÓDIGO-DEL-ESTADO/URs/Presupuesto/:ClaveUnidadResponsable/:Filtro?{v=VERSION_DEL_PRESUPUESTO,a=AÑO_DEL_PRESUPUESTO}
+Presupuesto a pesos corrientes de la Unidad Responsable definida en :ClaveUnidadResponsable para el filtro especificado, el cual puede ser la clave de un Objeto de Gasto, Partida Genérica, Concepto General o de un Capítulo de Gasto, por default arroja la última versión disponible. Se puede especificar el año deseado (a) o la versión del presupuesto (v) como variables de la URL.
+
 ### GET /CÓDIGO-DEL-ESTADO/CapituloGasto?{v=VERSION_DEL_PRESUPUESTO,a=AÑO_DEL_PRESUPUESTO}
 Presupuesto agrupado por Capítulo de Gasto a pesos corrientes, por default arroja la última versión disponible. Se puede especificar el año deseado (a) o la versión del presupuesto (v) como variables de la URL.
 
