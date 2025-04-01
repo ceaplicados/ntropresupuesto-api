@@ -1,51 +1,15 @@
 import express from 'express';
 import CapitulosDeGasto from '../controllers/CapitulosDeGasto.js';
-import VersionPresupuesto from '../models/VersionPresupuesto.js';
-import VersionesPresupuesto from '../controllers/VersionesPresupuesto.js';
 
 const router = express.Router();
 const capitulosDeGasto=new CapitulosDeGasto();
-const versionesPresupuesto = new VersionesPresupuesto();
 
-let versionPresupuesto=new VersionPresupuesto();
-
-router.use("/*",(req,res,next)=>{
-    const getVersionPresupuesto = new Promise((resolve) => {
-        if(req.query.v){
-            versionesPresupuesto.show(req.query.v)
-            .then(
-                (value) => {
-                    versionPresupuesto=value;
-                    if(versionPresupuesto.Id){
-                        resolve(versionPresupuesto.Id);
-                    }
-                }
-            )
-        }else{
-            let anio=null;
-            if(req.query.a){
-                anio=req.query.a;
-            }
-            versionesPresupuesto.getActiva(res.locals.estado.Id,anio)
-            .then( 
-                (value) => {
-                    versionPresupuesto=value;
-                    if(versionPresupuesto.Id){
-                        next();
-                    }
-                }, 
-                (error) => res.status(500).json({message: 'Error al consultar la BDD'})
-            )
-        }
-    })
-    
-});
 router.get("/",(req,res) => {
-    capitulosDeGasto.getByVersion(versionPresupuesto.Id)
+    capitulosDeGasto.getByVersion(res.locals.versionPresupuesto.Id)
     .then(
         (value) => {
             res.status(200).json({
-                versionPresupuesto: versionPresupuesto,
+                versionPresupuesto: res.locals.versionPresupuesto,
                 presupuesto: value
             })
         },
@@ -53,12 +17,12 @@ router.get("/",(req,res) => {
     )
 })
 router.get("/:ClaveCapituloGasto",(req,res) => {
-    capitulosDeGasto.getByVersion(versionPresupuesto.Id,req.params.ClaveCapituloGasto)
+    capitulosDeGasto.getByVersion(res.locals.versionPresupuesto.Id,req.params.ClaveCapituloGasto)
     .then(
         (value) => {
             if(value.Clave){
                 res.status(200).json({
-                    versionPresupuesto: versionPresupuesto,
+                    versionPresupuesto: res.locals.versionPresupuesto,
                     presupuesto: value
                 })
             }else{

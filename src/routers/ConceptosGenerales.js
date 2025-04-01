@@ -1,51 +1,15 @@
 import express from 'express';
 import ConceptosGenerales from '../controllers/ConceptosGenerales.js';
-import VersionPresupuesto from '../models/VersionPresupuesto.js';
-import VersionesPresupuesto from '../controllers/VersionesPresupuesto.js';
 
 const router = express.Router();
 const conceptosGenerales=new ConceptosGenerales();
-const versionesPresupuesto = new VersionesPresupuesto();
 
-let versionPresupuesto=new VersionPresupuesto();
-
-router.use("/*",(req,res,next)=>{
-    const getVersionPresupuesto = new Promise((resolve) => {
-        if(req.query.v){
-            versionesPresupuesto.show(req.query.v)
-            .then(
-                (value) => {
-                    versionPresupuesto=value;
-                    if(versionPresupuesto.Id){
-                        resolve(versionPresupuesto.Id);
-                    }
-                }
-            )
-        }else{
-            let anio=null;
-            if(req.query.a){
-                anio=req.query.a;
-            }
-            versionesPresupuesto.getActiva(res.locals.estado.Id,anio)
-            .then( 
-                (value) => {
-                    versionPresupuesto=value;
-                    if(versionPresupuesto.Id){
-                        next();
-                    }
-                }, 
-                (error) => res.status(500).json({message: 'Error al consultar la BDD'})
-            )
-        }
-    })
-    
-});
 router.get("/",(req,res) => {
-    conceptosGenerales.getByVersion(versionPresupuesto.Id)
+    conceptosGenerales.getByVersion(res.locals.versionPresupuesto.Id)
     .then(
         (value) => {
             res.status(200).json({
-                versionPresupuesto: versionPresupuesto,
+                versionPresupuesto: res.locals.versionPresupuesto.Id,
                 presupuesto: value
             })
         },
@@ -58,11 +22,11 @@ router.get("/:Filtro",(req,res) => {
     
     if(exCapituloGasto.test(filtro)){
         // Filtro por capítulo de gasto
-        conceptosGenerales.getByVersionCapituloGasto(versionPresupuesto.Id,filtro)
+        conceptosGenerales.getByVersionCapituloGasto(res.locals.versionPresupuesto.Id,filtro)
         .then(
             (value) => {
                 res.status(200).json({
-                    versionPresupuesto: versionPresupuesto,
+                    versionPresupuesto: res.locals.versionPresupuesto,
                     presupuesto: value
                 })
                 
@@ -71,12 +35,12 @@ router.get("/:Filtro",(req,res) => {
         )
     }else{
         // Filtro por concepto general
-        conceptosGenerales.getByVersion(versionPresupuesto.Id,filtro)
+        conceptosGenerales.getByVersion(res.locals.versionPresupuesto.Id,filtro)
         .then(
             (value) => {
                 if(value.Clave){
                     res.status(200).json({
-                        versionPresupuesto: versionPresupuesto,
+                        versionPresupuesto: res.locals.versionPresupuesto,
                         presupuesto: value
                     })
                 }else{

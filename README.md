@@ -52,6 +52,12 @@ Presupuesto agrupado por PartidasGenericas a pesos corrientes, por default arroj
 ### GET /CÓDIGO-DEL-ESTADO/PartidasGenericas/:Filtro?{v=VERSION_DEL_PRESUPUESTO,a=AÑO_DEL_PRESUPUESTO}
 Presupuesto agrupado por PartidasGenericas a pesos corrientes para el filtro especificado, el cual puede ser la clave de una Partida Genérica, Concepto General o de un Capítulo de Gasto, por default arroja la última versión disponible. Se puede especificar el año deseado (a) o la versión del presupuesto (v) como variables de la URL.
 
+### GET /CÓDIGO-DEL-ESTADO/ObjetoDeGasto?{v=VERSION_DEL_PRESUPUESTO,a=AÑO_DEL_PRESUPUESTO}
+Presupuesto a pesos corrientes, por default arroja la última versión disponible. Se puede especificar el año deseado (a) o la versión del presupuesto (v) como variables de la URL.
+
+### GET /CÓDIGO-DEL-ESTADO/ObjetoDeGasto/:Filtro?{v=VERSION_DEL_PRESUPUESTO,a=AÑO_DEL_PRESUPUESTO}
+Presupuesto a pesos corrientes para el filtro especificado, el cual puede ser la clave de un Objeto de Gasto, Partida Genérica, Concepto General o de un Capítulo de Gasto, por default arroja la última versión disponible. Se puede especificar el año deseado (a) o la versión del presupuesto (v) como variables de la URL.
+
 ## Cuadernos
 ### GET /Cuadernos
 Listado de los cuadernos de trabajo públicos
