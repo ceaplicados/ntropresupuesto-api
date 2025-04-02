@@ -2,6 +2,31 @@ import connection from '../../config/db.conf.js';
 import ConceptoGeneral from '../models/ConceptoGeneral.js';
 
 export default class ConceptosGenerales {
+    async getById (idConceptoGeneral) {
+        let result=[];
+        let query='SELECT * FROM `ConceptosGenerales` '
+        query+='WHERE `Id`= ? ;';
+        let params = [idConceptoGeneral];
+        try {
+            const [results] = await connection.query(query, params);
+            result = results.map((row) => {
+                let conceptoGeneral = new ConceptoGeneral();
+                conceptoGeneral.Id = row.Id;
+                conceptoGeneral.Clave = row.Clave;
+                conceptoGeneral.Nombre = row.Nombre;
+                delete conceptoGeneral.Monto;
+                conceptoGeneral.CapituloGasto = row.CapituloGasto;
+                return conceptoGeneral;
+            });
+        } catch (err) {
+            console.log(err);
+        }
+        if(result.length==1){
+            result=result[0];
+        }
+        return result;
+    }
+
     async getByVersion (idVersion,claveConceptoGeneral) {
         let result=[];
         let query='SELECT `ConceptosGenerales`.*, SUM(`Monto`) AS Monto FROM `ConceptosGenerales` '

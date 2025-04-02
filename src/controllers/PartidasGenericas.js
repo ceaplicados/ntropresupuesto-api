@@ -2,6 +2,32 @@ import connection from '../../config/db.conf.js';
 import PartidaGenerica from '../models/PartidaGenerica.js';
 
 export default class PartidasGenericas {
+    async getById (idPartidaGenerica) {
+        let result=[];
+        let query='SELECT * FROM `PartidasGenericas` '
+        query+='WHERE `Id`= ? ;';
+        let params = [idPartidaGenerica];
+        
+        try {
+            const [results] = await connection.query(query, params);
+            result = results.map((row) => {
+                let partidaGenerica = new PartidaGenerica();
+                partidaGenerica.Id = row.Id;
+                partidaGenerica.Clave = row.Clave;
+                partidaGenerica.Nombre = row.Nombre;
+                delete partidaGenerica.Monto;
+                partidaGenerica.ConceptoGeneral = row.ConceptoGeneral;
+                return partidaGenerica;
+            });
+        } catch (err) {
+            console.log(err);
+        }
+        if(result.length==1){
+            result=result[0];
+        }
+        return result;
+    }
+
     async getByVersion (idVersion,clavePartidaGenerica) {
         let result=[];
         let query='SELECT `PartidasGenericas`.*, SUM(`Monto`) AS Monto FROM `PartidasGenericas` '

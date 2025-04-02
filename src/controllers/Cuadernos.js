@@ -6,6 +6,11 @@ import AniosCuaderno from './AniosCuaderno.js';
 import VersionesPresupuesto from './VersionesPresupuesto.js';
 import UnidadesPresupuestales from './UnidadesPresupuestales.js';
 import UnidadesResponsables from './UnidadesResponsables.js';
+import CapitulosDeGasto from './CapitulosDeGasto.js';
+import ConceptosGenerales from './ConceptosGenerales.js';
+import PartidasGenericas from './PartidasGenericas.js';
+import ObjetosDeGasto from './ObjetosDeGasto.js';
+
 
 export default class Usuarios {
     renglonesCuaderno = new RenglonesCuaderno();
@@ -13,6 +18,10 @@ export default class Usuarios {
     versionesPresupuesto=new VersionesPresupuesto();
     unidadesPresupuestales=new UnidadesPresupuestales();
     unidadesResponsables=new UnidadesResponsables();
+    capitulosDeGasto=new CapitulosDeGasto();
+    conceptosGenerales=new ConceptosGenerales();
+    partidasGenericas= new PartidasGenericas();
+    objetosDeGasto=new ObjetosDeGasto();
 
     async getUsers (cuaderno) {
         try{
@@ -224,6 +233,7 @@ export default class Usuarios {
 
             // para cada renglón, obtener los datos para cada versión
             let datos=[];
+            let referencias={};
             for(let i=0;i<cuaderno.Renglones.length;i++){
                 let renglon=cuaderno.Renglones[i];
                 let estado=renglon.Estado;
@@ -233,12 +243,44 @@ export default class Usuarios {
                 if(versionesEstado.length>0){
                     versionesEstado=versionesEstado[0].versiones;
                 }
-                        
+
+                // Obtener el objeto de referencia
+                if(!referencias[renglon.Tipo]){
+                    referencias[renglon.Tipo]={};
+                }
+                if(!referencias[renglon.Tipo][renglon.IdReferencia]){
+                    switch (renglon.Tipo){
+                        case "CapituloGasto":
+                            referencias[renglon.Tipo][renglon.IdReferencia] = await this.capitulosDeGasto.getById(renglon.IdReferencia);
+                            break;
+
+                        case "ConceptoGeneral":
+                            referencias[renglon.Tipo][renglon.IdReferencia] = await this.conceptosGenerales.getById(renglon.IdReferencia);
+                            break;
+
+                        case "PartidaGenerica":
+                            referencias[renglon.Tipo][renglon.IdReferencia] = await this.partidasGenericas.getById(renglon.IdReferencia);
+                            break;
+
+                        case "ObjetoGasto":
+                            let resultObjetoGasto = await this.objetosDeGasto.getById(renglon.IdReferencia);
+                            referencias[renglon.Tipo][renglon.IdReferencia] = resultObjetoGasto[0];
+                            break;
+
+                        case "ProgramaPresupuestal":
+                            break;
+                    }
+                }
+                if(referencias[renglon.Tipo][renglon.IdReferencia]){
+                    cuaderno.Renglones[i].Referencia=referencias[renglon.Tipo][renglon.IdReferencia];
+                }
+                // Objeto del renglón  
                 let row={
                     renglon: renglon.Id,
                     data: []
                 };
-                
+
+                // Rellenar los datos de cada columna
                 for(let j=0;j<versionesEstado.length;j++){
                     let version=versionesEstado[j];
                     let dato={
@@ -271,15 +313,75 @@ export default class Usuarios {
                             break;
                         
                         case "CapituloGasto":
+                            let claveCapituloDeGasto=referencias[renglon.Tipo][renglon.IdReferencia].Clave;
+                            switch (renglon.TipoFiltro) {
+                                case "Estado":
+                                    resultado=await this.capitulosDeGasto.getByVersion(version.Id,claveCapituloDeGasto);
+                                    dato.monto=resultado.Monto;
+                                    break;
+
+                                case "UP":
+                                    
+                                    break;
+
+                                case "UR":
+                                    
+                                    break;
+                            }
                             break;
                         
                         case "ConceptoGeneral":
+                            let claveConceptoGeneral=referencias[renglon.Tipo][renglon.IdReferencia].Clave;
+                            switch (renglon.TipoFiltro) {
+                                case "Estado":
+                                    resultado=await this.conceptosGenerales.getByVersion(version.Id,claveConceptoGeneral);
+                                    dato.monto=resultado.Monto;
+                                    break;
+
+                                case "UP":
+                                    
+                                    break;
+
+                                case "UR":
+                                    
+                                    break;
+                            }
                             break;
 
                         case "PartidaGenerica":
+                            let clavePartidaGenerica=referencias[renglon.Tipo][renglon.IdReferencia].Clave;
+                            switch (renglon.TipoFiltro) {
+                                case "Estado":
+                                    resultado=await this.partidasGenericas.getByVersion(version.Id,clavePartidaGenerica);
+                                    dato.monto=resultado.Monto;
+                                    break;
+
+                                case "UP":
+                                    
+                                    break;
+
+                                case "UR":
+                                    
+                                    break;
+                            }
                             break;
 
                         case "ObjetoGasto":
+                            let claveObjetoGasto=referencias[renglon.Tipo][renglon.IdReferencia].Clave;
+                            switch (renglon.TipoFiltro) {
+                                case "Estado":
+                                    resultado=await this.objetosDeGasto.getByVersion(version.Id,claveObjetoGasto);
+                                    dato.monto=resultado.reduce( (monto,partida) => {return monto + partida.Monto} , 0 )
+                                    break;
+
+                                case "UP":
+                                    
+                                    break;
+
+                                case "UR":
+                                    
+                                    break;
+                            }
                             break;
 
                         case "ProgramaPresupuestal":

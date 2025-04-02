@@ -9,5 +9,7 @@ export default class RenglonCuaderno{
         this.Graph = null
         this.Mostrar = null
         this.Data = []
+        this.Referencia = null
+        this.Filtro = null
     }
 }

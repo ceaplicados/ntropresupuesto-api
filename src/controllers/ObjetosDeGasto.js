@@ -2,6 +2,29 @@ import connection from '../../config/db.conf.js';
 import ObjetoDeGasto from '../models/ObjetoDeGasto.js';
 
 export default class ObjetosDeGasto {
+    async getById (idObjetoDeGasto) {
+        let result=[];
+        let query='SELECT * FROM `ObjetoDeGasto` '
+        query+='WHERE `Id`= ? ';
+        let params = [idObjetoDeGasto];
+        
+        try {
+            const [results] = await connection.query(query, params);
+            result = results.map((row) => {
+                let objetoDeGasto = new ObjetoDeGasto();
+                objetoDeGasto.Id = row.Id;
+                objetoDeGasto.Clave = row.Clave;
+                objetoDeGasto.Nombre = row.Nombre;
+                delete objetoDeGasto.Monto;
+                objetoDeGasto.PartidaGenerica = row.PartidaGenerica;
+                return objetoDeGasto;
+            });
+        } catch (err) {
+            console.log(err);
+        }
+        return result;
+    }
+
     async getByVersion (idVersion,claveObjetoDeGasto) {
         let result=[];
         let query='SELECT * FROM `ObjetoDeGasto` '
@@ -14,7 +37,7 @@ export default class ObjetosDeGasto {
         }
 
         query+=' ORDER BY `ObjetoDeGasto`.`Clave`;';
-        console.log(query);
+
         try {
             const [results] = await connection.query(query, params);
             result = results.map((row) => {
