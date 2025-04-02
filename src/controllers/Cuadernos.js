@@ -10,6 +10,7 @@ import CapitulosDeGasto from './CapitulosDeGasto.js';
 import ConceptosGenerales from './ConceptosGenerales.js';
 import PartidasGenericas from './PartidasGenericas.js';
 import ObjetosDeGasto from './ObjetosDeGasto.js';
+import ProgramasPresupuestales from './ProgramasPresupuestales.js';
 
 
 export default class Usuarios {
@@ -22,6 +23,7 @@ export default class Usuarios {
     conceptosGenerales=new ConceptosGenerales();
     partidasGenericas= new PartidasGenericas();
     objetosDeGasto=new ObjetosDeGasto();
+    programasPresupuestales=new ProgramasPresupuestales();
 
     async getUsers (cuaderno) {
         try{
@@ -269,6 +271,7 @@ export default class Usuarios {
                             break;
 
                         case "ProgramaPresupuestal":
+                            referencias[renglon.Tipo][renglon.IdReferencia]= await this.programasPresupuestales.getById(renglon.IdReferencia)
                             break;
                     }
                 }
@@ -434,6 +437,8 @@ export default class Usuarios {
                             break;
 
                         case "ProgramaPresupuestal":
+                            resultado=await this.programasPresupuestales.showMontosByVersionPresupuestoClavePP(version.Id,claveReferencia);
+                            dato.monto=resultado.reduce( (monto,partida) => {return monto + partida.Monto} , 0 )
                             break;
                     }
                     row.data.push(dato);
