@@ -2,6 +2,34 @@ import connection from '../../config/db.conf.js';
 import UnidadResponsable from '../models/UnidadResponsable.js';
 
 export default class UnidadesResponsables {
+    async getById (idUnidadResponsable) {
+        let result=new UnidadResponsable();
+        try {
+            const [results] = await connection.query(
+                'SELECT UnidadResponsable.*, CONCAT(UnidadPresupuestal.Clave,"-",UnidadResponsable.Clave) AS ClaveCompleta FROM UnidadResponsable '
+                    +' JOIN UnidadPresupuestal ON UnidadPresupuestal.Id=UnidadResponsable.UnidadPresupuestal '
+                    +' WHERE UnidadResponsable.Id=?;',
+                [idUnidadResponsable])
+            
+            result=results.map((row) => {
+                let unidadResponsable=new UnidadResponsable();
+                unidadResponsable.Id=row.Id;
+                unidadResponsable.Clave=row.ClaveCompleta;
+                unidadResponsable.Nombre=row.Nombre;
+                unidadResponsable.UnidadPresupuestal=row.UnidadPresupuestal;
+                unidadResponsable.OtrosNombres=row.OtrosNombres;
+                delete unidadResponsable.Monto;
+                return unidadResponsable;
+            });
+            if(result.length>0){
+                result=result[0];
+            }
+        }catch (err) {
+            console.log(err);
+        }
+        return result;
+    };
+
     async getByEstado (idEstado) {
         let result=[];
         try {
@@ -161,7 +189,7 @@ export default class UnidadesResponsables {
                 query += ' GROUP BY UnidadResponsable.Id ';
                 query += ' HAVING ClaveCompleta = ?';
             let params = [idVersion,clavePartidaGenerica,ClaveUnidadResponsable];
-            console.log(query,params);
+
             const [results] = await connection.query(query,params)
             result=results.map((row) => {
                 let unidadResponsable=new UnidadResponsable();
@@ -189,7 +217,7 @@ export default class UnidadesResponsables {
                 query += ' GROUP BY UnidadResponsable.Id ';
                 query += ' HAVING ClaveCompleta = ?';
             let params = [idVersion,claveObjetoGasto,ClaveUnidadResponsable];
-            console.log(query,params);
+
             const [results] = await connection.query(query,params)
             result=results.map((row) => {
                 let unidadResponsable=new UnidadResponsable();

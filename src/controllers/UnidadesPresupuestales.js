@@ -2,6 +2,33 @@ import connection from '../../config/db.conf.js';
 import UnidadPresupuestal from '../models/UnidadPresupuestal.js';
 
 export default class UnidadesPresupuestales {
+    async getById (idUnidadPresupuestal) {
+        let result=new UnidadPresupuestal();
+        try {
+            const [results] = await connection.query(
+                'SELECT * FROM UnidadPresupuestal '
+                    +' WHERE UnidadPresupuestal.Id=?;',
+                [idUnidadPresupuestal])
+            
+                result=results.map((row) => {
+                let unidadPresupuestal=new UnidadPresupuestal();
+                unidadPresupuestal.Id=row.Id;
+                unidadPresupuestal.Clave=row.Clave;
+                unidadPresupuestal.Nombre=row.Nombre;
+                unidadPresupuestal.Estado=row.Estado;
+                delete unidadPresupuestal.Monto;
+                delete unidadPresupuestal.UnidadesResponsables;
+                return unidadPresupuestal;
+            });
+            if(results.length>0){
+                result=results[0];
+            }
+        }catch (err) {
+            console.log(err);
+        }
+        return result;
+    };
+    
     async getByEstado (idEstado) {
         let result=[];
         try {

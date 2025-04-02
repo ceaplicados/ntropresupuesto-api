@@ -234,6 +234,7 @@ export default class Usuarios {
             // para cada renglón, obtener los datos para cada versión
             let datos=[];
             let referencias={};
+            let filtros={};
             for(let i=0;i<cuaderno.Renglones.length;i++){
                 let renglon=cuaderno.Renglones[i];
                 let estado=renglon.Estado;
@@ -274,6 +275,26 @@ export default class Usuarios {
                 if(referencias[renglon.Tipo][renglon.IdReferencia]){
                     cuaderno.Renglones[i].Referencia=referencias[renglon.Tipo][renglon.IdReferencia];
                 }
+
+                // Obtener el objeto de filtro (Se omite el tipoFiltro "Estado")
+                if(!filtros[renglon.TipoFiltro]){
+                    filtros[renglon.TipoFiltro]={};
+                }
+                if(!filtros[renglon.TipoFiltro][renglon.IdFiltro]){
+                    switch (renglon.TipoFiltro){
+                        case "UP":
+                            filtros[renglon.TipoFiltro][renglon.IdFiltro] = await this.unidadesPresupuestales.getById(renglon.IdFiltro);
+                            break;
+
+                        case "UR":
+                            filtros[renglon.TipoFiltro][renglon.IdFiltro] = await this.unidadesResponsables.getById(renglon.IdFiltro);
+                            break;
+                    }
+                }
+                if(filtros[renglon.TipoFiltro][renglon.IdFiltro]){
+                    cuaderno.Renglones[i].Filtro=filtros[renglon.TipoFiltro][renglon.IdFiltro];
+                }
+
                 // Objeto del renglón  
                 let row={
                     renglon: renglon.Id,
@@ -283,6 +304,14 @@ export default class Usuarios {
                 // Rellenar los datos de cada columna
                 for(let j=0;j<versionesEstado.length;j++){
                     let version=versionesEstado[j];
+                    let claveFiltro=null;
+                    let claveReferencia=null;
+                    if(renglon.Referencia){
+                        claveReferencia=renglon.Referencia.Clave;
+                    }
+                    if(renglon.Filtro){
+                        claveFiltro=renglon.Filtro.Clave;
+                    }
                     let dato={
                         version: version.Id,
                         monto: null
@@ -313,73 +342,93 @@ export default class Usuarios {
                             break;
                         
                         case "CapituloGasto":
-                            let claveCapituloDeGasto=referencias[renglon.Tipo][renglon.IdReferencia].Clave;
                             switch (renglon.TipoFiltro) {
                                 case "Estado":
-                                    resultado=await this.capitulosDeGasto.getByVersion(version.Id,claveCapituloDeGasto);
+                                    resultado=await this.capitulosDeGasto.getByVersion(version.Id,claveReferencia);
                                     dato.monto=resultado.Monto;
                                     break;
 
                                 case "UP":
-                                    
+                                    resultado=await this.unidadesPresupuestales.showMontosByVersionPresupuestoClaveUPCapituloGasto(version.Id,claveFiltro,claveReferencia);
+                                    if(resultado.length>0){
+                                        dato.monto=resultado[0].Monto;
+                                    }
                                     break;
 
                                 case "UR":
-                                    
+                                    resultado=await this.unidadesResponsables.showMontosByVersionPresupuestoClaveURCapituloGasto(version.Id,claveFiltro,claveReferencia);
+                                    if(resultado.length>0){
+                                        dato.monto=resultado[0].Monto;
+                                    }
                                     break;
                             }
                             break;
                         
                         case "ConceptoGeneral":
-                            let claveConceptoGeneral=referencias[renglon.Tipo][renglon.IdReferencia].Clave;
                             switch (renglon.TipoFiltro) {
                                 case "Estado":
-                                    resultado=await this.conceptosGenerales.getByVersion(version.Id,claveConceptoGeneral);
+                                    resultado=await this.conceptosGenerales.getByVersion(version.Id,claveReferencia);
                                     dato.monto=resultado.Monto;
                                     break;
 
                                 case "UP":
-                                    
+                                    resultado=await this.unidadesPresupuestales.showMontosByVersionPresupuestoClaveUPConceptoGeneral(version.Id,claveFiltro,claveReferencia);
+                                    if(resultado.length>0){
+                                        dato.monto=resultado[0].Monto;
+                                    }
                                     break;
 
                                 case "UR":
-                                    
+                                    resultado=await this.unidadesResponsables.showMontosByVersionPresupuestoClaveURConceptoGeneral(version.Id,claveFiltro,claveReferencia);
+                                    if(resultado.length>0){
+                                        dato.monto=resultado[0].Monto;
+                                    }
                                     break;
                             }
                             break;
 
                         case "PartidaGenerica":
-                            let clavePartidaGenerica=referencias[renglon.Tipo][renglon.IdReferencia].Clave;
                             switch (renglon.TipoFiltro) {
                                 case "Estado":
-                                    resultado=await this.partidasGenericas.getByVersion(version.Id,clavePartidaGenerica);
+                                    resultado=await this.partidasGenericas.getByVersion(version.Id,claveReferencia);
                                     dato.monto=resultado.Monto;
                                     break;
 
                                 case "UP":
-                                    
+                                    resultado=await this.unidadesPresupuestales.showMontosByVersionPresupuestoClaveUPPartidaGenerica(version.Id,claveFiltro,claveReferencia);
+                                    if(resultado.length>0){
+                                        dato.monto=resultado[0].Monto;
+                                    }
                                     break;
 
                                 case "UR":
-                                    
+                                    resultado=await this.unidadesResponsables.showMontosByVersionPresupuestoClaveURPartidaGenerica(version.Id,claveFiltro,claveReferencia);
+                                    if(resultado.length>0){
+                                        dato.monto=resultado[0].Monto;
+                                    }
                                     break;
                             }
                             break;
 
                         case "ObjetoGasto":
-                            let claveObjetoGasto=referencias[renglon.Tipo][renglon.IdReferencia].Clave;
                             switch (renglon.TipoFiltro) {
                                 case "Estado":
-                                    resultado=await this.objetosDeGasto.getByVersion(version.Id,claveObjetoGasto);
+                                    resultado=await this.objetosDeGasto.getByVersion(version.Id,claveReferencia);
                                     dato.monto=resultado.reduce( (monto,partida) => {return monto + partida.Monto} , 0 )
                                     break;
 
                                 case "UP":
-                                    
+                                    resultado=await this.unidadesPresupuestales.showMontosByVersionPresupuestoClaveUPObjetoGasto(version.Id, claveFiltro,claveReferencia);
+                                    if(resultado.length>0){
+                                        dato.monto=resultado[0].Monto;
+                                    }
                                     break;
 
                                 case "UR":
-                                    
+                                    resultado=await this.unidadesResponsables.showMontosByVersionPresupuestoClaveURObjetoGasto(version.Id, claveFiltro,claveReferencia);
+                                    if(resultado.length>0){
+                                        dato.monto=resultado[0].Monto;
+                                    }
                                     break;
                             }
                             break;
