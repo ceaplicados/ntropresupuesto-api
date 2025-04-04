@@ -112,14 +112,42 @@ export default class Usuarios {
         let result=[];
         try {
             const [results] = await connection.query(
-                'SELECT Cuadernos.* FROM Cuadernos JOIN Usuarios ON Cuadernos.Owner=Usuarios.Id WHERE Usuarios.UUID=?',[UUID])
+                'SELECT *, Cuadernos.Id AS CuadernosId, Cuadernos.Nombre AS CuadernosNombre, Usuarios.Nombre AS UsuariosNombre '
+                    +' FROM (SELECT Cuadernos.* FROM Cuadernos '
+                    +' JOIN Usuarios ON Cuadernos.Owner=Usuarios.Id '
+                    +' WHERE Usuarios.UUID=?'
+                    +' UNION '
+                    +'SELECT Cuadernos.* FROM Cuadernos '
+                    +' JOIN UsuariosCuaderno ON UsuariosCuaderno.Cuaderno=Cuadernos.Id '
+                    +' JOIN Usuarios ON Usuarios.Id=UsuariosCuaderno.Usuario'
+                    +' WHERE Usuarios.UUID=?) AS Cuadernos'
+                    +' JOIN Usuarios ON Cuadernos.Owner=Usuarios.Id',[UUID,UUID])
             
                 result=results.map((row) => {
                     let cuaderno=new Cuaderno();
-                    cuaderno.Id  = row.Id
-                    delete cuaderno.Owner 
+                    cuaderno.Id  = row.CuadernosId
+                    
+                    let owner=new Usuario();
+                    delete owner.Id
+                    owner.UUID  = row.UUID
+                    owner.Nombre = row.UsuariosNombre
+                    owner.Apellidos = row.Apellidos
+                    owner.Sobrenombre = row.Sobrenombre
+                    delete owner.Email
+                    delete owner.Password
+                    delete owner.Estado
+                    owner.Activo = true
+                    if(row.Activo==0){
+                        owner.Activo = false
+                    }
+                    delete owner.ResetKey
+                    owner.Image = row.Image
+                    delete owner.GoogleId 
+                    delete owner.Admin
+
+                    cuaderno.Owner = owner; 
                     cuaderno.DateBorn = row.DateBorn
-                    cuaderno.Nombre = row.Nombre
+                    cuaderno.Nombre = row.CuadernosNombre
                     cuaderno.Descripcion = row.Descripcion
                     cuaderno.Publico = true
                     if(row.Publico==0){
@@ -173,7 +201,7 @@ export default class Usuarios {
                     cuaderno.Id  = row.CuadernosId
                     cuaderno.Owner = owner
                     cuaderno.DateBorn = row.DateBorn
-                    cuaderno.Nombre = row.Nombre
+                    cuaderno.Nombre = row.CuadernosNombre
                     cuaderno.Descripcion = row.Descripcion
                     cuaderno.Publico = true
                     if(row.Publico==0){
