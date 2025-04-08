@@ -82,6 +82,7 @@ router.use(/^(?!(\/|\/URs|\/UPs)$).*$/,( req, res, next ) => {
 });
 
 router.use("/", versionesPresupuesto);
+router.use("/Historico", versionesPresupuesto);
 router.use("/URs", URs);
 router.use("/UPs", UPs);
 router.use("/CapituloGasto", CapituloGasto);

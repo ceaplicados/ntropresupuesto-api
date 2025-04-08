@@ -8,6 +8,7 @@ export default class VersionPresupuesto{
         this.Fecha = null
         this.Actual = null
         this.ObjetoGasto = null
-        this.ProgramaPresupuestal = null
+        this.ProgramaPresupuestal = null,
+        this.Monto = null
     }
 }

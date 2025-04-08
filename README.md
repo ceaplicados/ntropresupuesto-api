@@ -22,6 +22,9 @@ Histórico del total del gasto federalizado agrupado en Participaciones, Aportac
 ### GET /CÓDIGO-DEL-ESTADO
 Versiones del presupuesto disponibles para el estado en la base de datos de #NuestroPresupuesto
 
+### GET /CÓDIGO-DEL-ESTADO/Historico
+Presupuesto histórico a pesos corrientes para el estado señalado para las versiones marcadas como actuales de cada año.
+
 ### GET /CÓDIGO-DEL-ESTADO/UPs/
 Listado histórico de todas las Unidades Presupuestales en el estado.
 

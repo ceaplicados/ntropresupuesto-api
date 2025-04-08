@@ -143,4 +143,44 @@ export default class VersionesPresupuesto {
         }
         return total;
     }
+
+    async getHistoricoByEstado (idEstado) {
+        let result=[];
+        try {
+            let query='SELECT `VersionesPresupuesto`.*, SUM(Monto) AS Monto '
+            +'FROM `VersionesPresupuesto` '
+            +'JOIN `ObjetoDeGasto` ON `ObjetoDeGasto`.`VersionPresupuesto`=`VersionesPresupuesto`.`Id` '
+            +'WHERE `Estado` = ? AND `Actual`=1 '
+            +'GROUP BY `VersionesPresupuesto`.`Id` '
+            +'ORDER BY Anio ASC,Fecha DESC';
+            let params=[idEstado];
+            const [results] = await connection.query(query,params)
+            result=results.map((row) => {
+                let versionPresupuesto=new VersionPresupuesto();
+                versionPresupuesto.Id=row.Id;
+                versionPresupuesto.Estado=row.Estado;
+                versionPresupuesto.Anio=row.Anio;
+                versionPresupuesto.Tipo=row.Nombre;
+                versionPresupuesto.Descripcion=row.Descripcion;
+                versionPresupuesto.Fecha=new Date(row.Fecha);
+                versionPresupuesto.Actual=false;
+                if(row.Actual===1){
+                    versionPresupuesto.Actual=true;
+                }
+                versionPresupuesto.ObjetoGasto=false;
+                if(row.ObjetoGasto===1){
+                    versionPresupuesto.ObjetoGasto=true;
+                }
+                versionPresupuesto.ProgramaPresupuestal=false;
+                if(row.ProgramaPresupuestal===1){
+                    versionPresupuesto.ProgramaPresupuestal=true;
+                }
+                versionPresupuesto.Monto=row.Monto;
+                return versionPresupuesto;
+            });
+        } catch (err) {
+            console.log(err);
+        }
+        return result;
+    }
 }
