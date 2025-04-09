@@ -9,6 +9,7 @@ import CapituloGasto from './CapituloGasto.js';
 import ConceptosGenerales from './ConceptosGenerales.js';
 import PartidasGenericas from './PartidasGenericas.js';
 import ObjetosDeGasto from './ObjetosDeGasto.js';
+import ProgramasPresupuestales from './ProgramasPresupuestales.js';
 
 const router = express.Router();
 const versionesPresupuesto_controller = new VersionesPresupuesto();
@@ -89,5 +90,6 @@ router.use("/CapituloGasto", CapituloGasto);
 router.use("/ConceptosGenerales", ConceptosGenerales);
 router.use("/PartidasGenericas", PartidasGenericas);
 router.use("/ObjetoDeGasto", ObjetosDeGasto);
+router.use("/Programas", ProgramasPresupuestales);
 
 export default router;

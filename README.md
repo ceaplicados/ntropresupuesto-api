@@ -73,6 +73,12 @@ Presupuesto a pesos corrientes, por default arroja la última versión disponibl
 ### GET /CÓDIGO-DEL-ESTADO/ObjetoDeGasto/:Filtro?{v=VERSION_DEL_PRESUPUESTO,a=AÑO_DEL_PRESUPUESTO}
 Presupuesto a pesos corrientes para el filtro especificado, el cual puede ser la clave de un Objeto de Gasto, Partida Genérica, Concepto General o de un Capítulo de Gasto, por default arroja la última versión disponible. Se puede especificar el año deseado (a) o la versión del presupuesto (v) como variables de la URL.
 
+### GET /CÓDIGO-DEL-ESTADO/Programas?{v=VERSION_DEL_PRESUPUESTO,a=AÑO_DEL_PRESUPUESTO,q=CANTIDAD}
+Listado de los top (q) programas presupuestarios a pesos corrientes ordenados descendentemente por el monto asignado, por default q=25.  En caso de que q=0 se muestra el listado completo de programas presupuestarios. Se puede especificar el año deseado (a) o la versión del presupuesto (v) como variables de la URL.
+
+### GET /CÓDIGO-DEL-ESTADO/Programas?{v=VERSION_DEL_PRESUPUESTO,a=AÑO_DEL_PRESUPUESTO,b=BUSCAR}
+Listado de los programas presupuestarios a pesos corrientes coincidentes con el término de búsqueda (b) ordenados por el monto clave. Se puede especificar el año deseado (a) o la versión del presupuesto (v) como variables de la URL.
+
 ## Cuadernos
 ### GET /Cuadernos
 Listado de los cuadernos de trabajo públicos
