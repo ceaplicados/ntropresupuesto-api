@@ -3,8 +3,10 @@ import cors from 'cors';
 import whitelist from './config/cors.js'
 import fs from 'fs/promises';
 import jwt from 'jsonwebtoken';
+import cookieParser from 'cookie-parser';
 import session from 'express-session';
 import compression from 'compression';
+
 import routerAuth from './src/routers/auth.js'
 import routerEstados from './src/routers/estados.js'
 import routerFederal from './src/routers/federal.js'
@@ -22,6 +24,7 @@ app.use(cors({
   }));
 app.use(compression());
 app.use(express.json());
+app.use(cookieParser());
 app.use(session({secret: process.env.SESSION_SECRET,resave:true,saveUninitialized:true}));
 
 const codigosEstados = estados.estados.map((estado) => {return "/"+estado.Codigo});

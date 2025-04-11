@@ -99,6 +99,9 @@ Actualiza la configuración del cuaderno indicado en IdCuaderno, la llamada debe
 ### POST /auth/Google
 Inicia sesión del usuario utilizando una credencial JWT de Google
 
+### GET /auth/refresh
+Obtiene un nuevo access token para el usuario autentificado
+
 ### GET /User
 Obtiene la información del usuario que está actualmente autenticado
 
