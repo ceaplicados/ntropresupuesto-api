@@ -155,7 +155,7 @@ router.get("/refresh", (req,res) => {
                         );
                         return res.status(200).json({
                             access_token: accessToken,
-                            expires_in: 60 * 60,
+                            expires_in: 30 * 1000,
                             token_type: "Bearer"
                         })
                     }
@@ -167,5 +167,33 @@ router.get("/refresh", (req,res) => {
         (error)  => res.status(500).json({message: 'Error al consultar la BDD'})
     )
 });
+
+router.get("/logout", (req,res) => {
+    const cookies = req.cookies;
+    if (!cookies?.jwt) return res.status(401).json({message: 'Missing token'})
+    const refreshToken = cookies.jwt;
+    
+    sessions.getByUID(refreshToken)
+    .then(
+        (session) => {
+            if(session.Id){
+                let DateDeath=new Date();
+                session.DateDeath=DateDeath.toISOString().replace(/T/, ' ').replace(/\..+/, '');
+                sessions.updateDateDeath(session)
+                .then(
+                    (session) => {
+                        res.clearCookie('jwt', {httpOnly: true, sameSite: 'None', secure: true});
+                        res.status(204).json({message: 'Logged out'})
+                    },
+                    (error)  => res.status(500).json({message: 'Error al consultar la BDD'})
+                );
+            }else{
+                res.clearCookie('jwt', {httpOnly: true, sameSite: 'None', secure: true});
+                res.status(204).json({message: 'Not valid token'})
+            }
+        },
+        (error)  => res.status(500).json({message: 'Error al consultar la BDD'})
+    )
+})
 
 export default router;
