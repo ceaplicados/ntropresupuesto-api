@@ -387,7 +387,7 @@ export default class Usuarios {
                                     break;
 
                                 case "UR":
-                                    resultado=await this.unidadesResponsables.showMontosByVersionPresupuestoClaveURCapituloGasto(version.Id,claveFiltro,claveReferencia);
+                                    resultado=await this.unidadesResponsables.showMontosByVersionesPresupuestoClaveURCapituloGasto([version.Id],claveFiltro,claveReferencia);
                                     if(resultado.length>0){
                                         dato.monto=resultado[0].Monto;
                                     }
@@ -410,7 +410,7 @@ export default class Usuarios {
                                     break;
 
                                 case "UR":
-                                    resultado=await this.unidadesResponsables.showMontosByVersionPresupuestoClaveURConceptoGeneral(version.Id,claveFiltro,claveReferencia);
+                                    resultado=await this.unidadesResponsables.showMontosByVersionesPresupuestoClaveURConceptoGeneral([version.Id],claveFiltro,claveReferencia);
                                     if(resultado.length>0){
                                         dato.monto=resultado[0].Monto;
                                     }
@@ -433,7 +433,7 @@ export default class Usuarios {
                                     break;
 
                                 case "UR":
-                                    resultado=await this.unidadesResponsables.showMontosByVersionPresupuestoClaveURPartidaGenerica(version.Id,claveFiltro,claveReferencia);
+                                    resultado=await this.unidadesResponsables.showMontosByVersionesPresupuestoClaveURPartidaGenerica([version.Id],claveFiltro,claveReferencia);
                                     if(resultado.length>0){
                                         dato.monto=resultado[0].Monto;
                                     }
@@ -456,7 +456,7 @@ export default class Usuarios {
                                     break;
 
                                 case "UR":
-                                    resultado=await this.unidadesResponsables.showMontosByVersionPresupuestoClaveURObjetoGasto(version.Id, claveFiltro,claveReferencia);
+                                    resultado=await this.unidadesResponsables.showMontosByVersionesPresupuestoClaveURObjetoGasto([version.Id], claveFiltro,claveReferencia);
                                     if(resultado.length>0){
                                         dato.monto=resultado[0].Monto;
                                     }

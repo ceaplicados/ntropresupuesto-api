@@ -27,6 +27,31 @@ export default class CapitulosDeGasto {
         return result;
     }
 
+    async getByClave (claveCapituloDeGasto) {
+        let result=[];
+        let query='SELECT * FROM `CapitulosGasto` '
+        query+='WHERE `Clave`= ? ;';
+        let params = [claveCapituloDeGasto];
+        
+        try {
+            const [results] = await connection.query(query, params);
+            result = results.map((row) => {
+                let capituloGasto = new CapituloGasto();
+                capituloGasto.Id=row.Id;
+                capituloGasto.Clave = row.Clave;
+                capituloGasto.Nombre = row.Nombre;
+                delete capituloGasto.Monto ;
+                return capituloGasto;
+            });
+        } catch (err) {
+            console.log(err);
+        }
+        if(result.length==1){
+            result=result[0];
+        }
+        return result;
+    }
+
     async getByVersion (idVersion,claveCapituloDeGasto) {
         let result=[];
         let query='SELECT `CapitulosGasto`.*, SUM(`Monto`) AS Monto FROM `CapitulosGasto` '

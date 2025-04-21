@@ -1,5 +1,6 @@
 import connection from '../../config/db.conf.js';
 import UnidadResponsable from '../models/UnidadResponsable.js';
+import VersionPresupuesto from '../models/VersionPresupuesto.js';
 
 export default class UnidadesResponsables {
     async getById (idUnidadResponsable) {
@@ -89,27 +90,38 @@ export default class UnidadesResponsables {
         }
     };
 
-    async showMontosByVersionPresupuestoClaveUR (idVersion,ClaveUnidadResponsable) {
+    async showMontosByVersionesPresupuestoClaveUR (idsVersiones,ClaveUnidadResponsable) {
         let result=[];
         try {
-            let query = 'SELECT UnidadResponsable.*,CONCAT(UnidadPresupuestal.Clave,"-",UnidadResponsable.Clave) AS ClaveCompleta, SUM(Monto) AS Monto FROM ObjetoDeGasto '
-                query +=' JOIN UnidadResponsable ON UnidadResponsable.Id=ObjetoDeGasto.UnidadResponsable'
-                query +=' JOIN UnidadPresupuestal ON UnidadPresupuestal.Id=UnidadResponsable.UnidadPresupuestal'
-                query +=' WHERE ObjetoDeGasto.VersionPresupuesto= ? '
-                query += ' GROUP BY UnidadResponsable.Id ';
-                query += ' HAVING ClaveCompleta = ?';
-            let params = [idVersion,ClaveUnidadResponsable];
+            let query = 'SELECT VersionesPresupuesto.*, SUM(Monto) AS Monto FROM VersionesPresupuesto  '
+                    +'JOIN ObjetoDeGasto ON VersionPresupuesto = VersionesPresupuesto.Id '
+                    +'JOIN ( '
+                    +'	SELECT UnidadResponsable.Id, CONCAT(UnidadPresupuestal.Clave,"-",UnidadResponsable.Clave) AS ClaveCompleta '
+                    +'	FROM UnidadResponsable '
+                    +'	JOIN UnidadPresupuestal ON UnidadPresupuestal.Id=UnidadResponsable.UnidadPresupuestal '
+                    +'	HAVING ClaveCompleta = ? '
+                    +') AS UnidadResponsable ON UnidadResponsable.Id=ObjetoDeGasto.UnidadResponsable '
+                    +'WHERE VersionesPresupuesto.Id IN ('+idsVersiones.join(',')+') '
+                    +'GROUP BY VersionesPresupuesto.Id ';
+            let params = [ClaveUnidadResponsable];
 
             const [results] = await connection.query(query,params)
             result=results.map((row) => {
-                let unidadResponsable=new UnidadResponsable();
-                unidadResponsable.Id=row.Id;
-                unidadResponsable.Clave=row.ClaveCompleta;
-                unidadResponsable.Nombre=row.Nombre;
-                unidadResponsable.UnidadPresupuestal=row.UnidadPresupuestal;
-                unidadResponsable.OtrosNombres=row.OtrosNombres;
-                unidadResponsable.Monto=row.Monto;
-                return unidadResponsable;
+                let versionPresupuesto = new VersionPresupuesto();
+                versionPresupuesto.Id  = row.Id;
+                versionPresupuesto.Estado = row.Estado;
+                versionPresupuesto.Anio = row.Anio;
+                versionPresupuesto.Tipo = row.Tipo;
+                versionPresupuesto.Descripcion = row.Descripcion;
+                versionPresupuesto.Fecha = row.Fecha;
+                versionPresupuesto.Actual = true;
+                if(row.Actual==0){
+                    versionPresupuesto.Actual = false;
+                }
+                delete versionPresupuesto.ObjetoGasto;
+                delete versionPresupuesto.ProgramaPresupuestal;
+                versionPresupuesto.Monto = row.Monto;
+                return versionPresupuesto;
             });
             return result;
         } catch (err) {
@@ -117,30 +129,42 @@ export default class UnidadesResponsables {
         }
     };
 
-    async showMontosByVersionPresupuestoClaveURCapituloGasto (idVersion,ClaveUnidadResponsable,claveCapituloGasto) {
+    async showMontosByVersionesPresupuestoClaveURCapituloGasto (idsVersiones,ClaveUnidadResponsable,claveCapituloGasto) {
         let result=[];
         try {
-            let query = 'SELECT UnidadResponsable.*,CONCAT(UnidadPresupuestal.Clave,"-",UnidadResponsable.Clave) AS ClaveCompleta, SUM(Monto) AS Monto FROM ObjetoDeGasto '
-                query +=' JOIN UnidadResponsable ON UnidadResponsable.Id=ObjetoDeGasto.UnidadResponsable'
-                query +=' JOIN UnidadPresupuestal ON UnidadPresupuestal.Id=UnidadResponsable.UnidadPresupuestal'
-                query +=' JOIN PartidasGenericas ON PartidasGenericas.Id=ObjetoDeGasto.PartidaGenerica'
-                query +=' JOIN ConceptosGenerales ON ConceptosGenerales.Id=PartidasGenericas.ConceptoGeneral'
-                query +=' JOIN CapitulosGasto ON CapitulosGasto.Id=ConceptosGenerales.CapituloGasto'
-                query +=' WHERE ObjetoDeGasto.VersionPresupuesto= ? AND CapitulosGasto.Clave= ?'
-                query += ' GROUP BY UnidadResponsable.Id ';
-                query += ' HAVING ClaveCompleta = ?';
-            let params = [idVersion,claveCapituloGasto,ClaveUnidadResponsable];
+            let query = 'SELECT VersionesPresupuesto.*, SUM(Monto) AS Monto FROM VersionesPresupuesto  '
+                    +'JOIN ObjetoDeGasto ON VersionPresupuesto = VersionesPresupuesto.Id '
+                    +'JOIN ( '
+                    +'	SELECT UnidadResponsable.Id, CONCAT(UnidadPresupuestal.Clave,"-",UnidadResponsable.Clave) AS ClaveCompleta '
+                    +'	FROM UnidadResponsable '
+                    +'	JOIN UnidadPresupuestal ON UnidadPresupuestal.Id=UnidadResponsable.UnidadPresupuestal '
+                    +'	HAVING ClaveCompleta = ? '
+                    +') AS UnidadResponsable ON UnidadResponsable.Id=ObjetoDeGasto.UnidadResponsable '
+                    +'JOIN PartidasGenericas ON PartidasGenericas.Id=ObjetoDeGasto.PartidaGenerica  '
+                    +'JOIN ConceptosGenerales ON ConceptosGenerales.Id=PartidasGenericas.ConceptoGeneral  '
+                    +'JOIN CapitulosGasto ON CapitulosGasto.Id=ConceptosGenerales.CapituloGasto  '
+                    +'WHERE VersionesPresupuesto.Id IN ('+idsVersiones.join(',')+') '
+                    +'AND CapitulosGasto.Clave=? '
+                    +'GROUP BY VersionesPresupuesto.Id ';
+            let params = [ClaveUnidadResponsable,claveCapituloGasto];
 
             const [results] = await connection.query(query,params)
             result=results.map((row) => {
-                let unidadResponsable=new UnidadResponsable();
-                unidadResponsable.Id=row.Id;
-                unidadResponsable.Clave=row.ClaveCompleta;
-                unidadResponsable.Nombre=row.Nombre;
-                unidadResponsable.UnidadPresupuestal=row.UnidadPresupuestal;
-                unidadResponsable.OtrosNombres=row.OtrosNombres;
-                unidadResponsable.Monto=row.Monto;
-                return unidadResponsable;
+                let versionPresupuesto = new VersionPresupuesto();
+                versionPresupuesto.Id  = row.Id;
+                versionPresupuesto.Estado = row.Estado;
+                versionPresupuesto.Anio = row.Anio;
+                versionPresupuesto.Tipo = row.Tipo;
+                versionPresupuesto.Descripcion = row.Descripcion;
+                versionPresupuesto.Fecha = row.Fecha;
+                versionPresupuesto.Actual = true;
+                if(row.Actual==0){
+                    versionPresupuesto.Actual = false;
+                }
+                delete versionPresupuesto.ObjetoGasto;
+                delete versionPresupuesto.ProgramaPresupuestal;
+                versionPresupuesto.Monto = row.Monto;
+                return versionPresupuesto;
             });
             return result;
         } catch (err) {
@@ -148,29 +172,41 @@ export default class UnidadesResponsables {
         }
     };
 
-    async showMontosByVersionPresupuestoClaveURConceptoGeneral (idVersion,ClaveUnidadResponsable,claveConceptoGeneral) {
+    async showMontosByVersionesPresupuestoClaveURConceptoGeneral (idsVersiones,ClaveUnidadResponsable,claveConceptoGeneral) {
         let result=[];
         try {
-            let query = 'SELECT UnidadResponsable.*,CONCAT(UnidadPresupuestal.Clave,"-",UnidadResponsable.Clave) AS ClaveCompleta, SUM(Monto) AS Monto FROM ObjetoDeGasto '
-                query +=' JOIN UnidadResponsable ON UnidadResponsable.Id=ObjetoDeGasto.UnidadResponsable'
-                query +=' JOIN UnidadPresupuestal ON UnidadPresupuestal.Id=UnidadResponsable.UnidadPresupuestal'
-                query +=' JOIN PartidasGenericas ON PartidasGenericas.Id=ObjetoDeGasto.PartidaGenerica'
-                query +=' JOIN ConceptosGenerales ON ConceptosGenerales.Id=PartidasGenericas.ConceptoGeneral'
-                query +=' WHERE ObjetoDeGasto.VersionPresupuesto= ? AND ConceptosGenerales.Clave= ?'
-                query += ' GROUP BY UnidadResponsable.Id ';
-                query += ' HAVING ClaveCompleta = ?';
-            let params = [idVersion,claveConceptoGeneral,ClaveUnidadResponsable];
+            let query = 'SELECT VersionesPresupuesto.*, SUM(Monto) AS Monto FROM VersionesPresupuesto  '
+                    +'JOIN ObjetoDeGasto ON VersionPresupuesto = VersionesPresupuesto.Id '
+                    +'JOIN ( '
+                    +'	SELECT UnidadResponsable.Id, CONCAT(UnidadPresupuestal.Clave,"-",UnidadResponsable.Clave) AS ClaveCompleta '
+                    +'	FROM UnidadResponsable '
+                    +'	JOIN UnidadPresupuestal ON UnidadPresupuestal.Id=UnidadResponsable.UnidadPresupuestal '
+                    +'	HAVING ClaveCompleta = ? '
+                    +') AS UnidadResponsable ON UnidadResponsable.Id=ObjetoDeGasto.UnidadResponsable '
+                    +'JOIN PartidasGenericas ON PartidasGenericas.Id=ObjetoDeGasto.PartidaGenerica  '
+                    +'JOIN ConceptosGenerales ON ConceptosGenerales.Id=PartidasGenericas.ConceptoGeneral  '
+                    +'WHERE VersionesPresupuesto.Id IN ('+idsVersiones.join(',')+') '
+                    +'AND ConceptosGenerales.Clave=? '
+                    +'GROUP BY VersionesPresupuesto.Id ';
+            let params = [ClaveUnidadResponsable,claveConceptoGeneral];
 
             const [results] = await connection.query(query,params)
             result=results.map((row) => {
-                let unidadResponsable=new UnidadResponsable();
-                unidadResponsable.Id=row.Id;
-                unidadResponsable.Clave=row.ClaveCompleta;
-                unidadResponsable.Nombre=row.Nombre;
-                unidadResponsable.UnidadPresupuestal=row.UnidadPresupuestal;
-                unidadResponsable.OtrosNombres=row.OtrosNombres;
-                unidadResponsable.Monto=row.Monto;
-                return unidadResponsable;
+                let versionPresupuesto = new VersionPresupuesto();
+                versionPresupuesto.Id  = row.Id;
+                versionPresupuesto.Estado = row.Estado;
+                versionPresupuesto.Anio = row.Anio;
+                versionPresupuesto.Tipo = row.Tipo;
+                versionPresupuesto.Descripcion = row.Descripcion;
+                versionPresupuesto.Fecha = row.Fecha;
+                versionPresupuesto.Actual = true;
+                if(row.Actual==0){
+                    versionPresupuesto.Actual = false;
+                }
+                delete versionPresupuesto.ObjetoGasto;
+                delete versionPresupuesto.ProgramaPresupuestal;
+                versionPresupuesto.Monto = row.Monto;
+                return versionPresupuesto;
             });
             return result;
         } catch (err) {
@@ -178,28 +214,40 @@ export default class UnidadesResponsables {
         }
     };
 
-    async showMontosByVersionPresupuestoClaveURPartidaGenerica (idVersion,ClaveUnidadResponsable,clavePartidaGenerica) {
+    async showMontosByVersionesPresupuestoClaveURPartidaGenerica (idsVersiones,ClaveUnidadResponsable,clavePartidaGenerica) {
         let result=[];
         try {
-            let query = 'SELECT UnidadResponsable.*,CONCAT(UnidadPresupuestal.Clave,"-",UnidadResponsable.Clave) AS ClaveCompleta, SUM(Monto) AS Monto FROM ObjetoDeGasto '
-                query +=' JOIN UnidadResponsable ON UnidadResponsable.Id=ObjetoDeGasto.UnidadResponsable'
-                query +=' JOIN UnidadPresupuestal ON UnidadPresupuestal.Id=UnidadResponsable.UnidadPresupuestal'
-                query +=' JOIN PartidasGenericas ON PartidasGenericas.Id=ObjetoDeGasto.PartidaGenerica'
-                query +=' WHERE ObjetoDeGasto.VersionPresupuesto= ? AND PartidasGenericas.Clave= ?'
-                query += ' GROUP BY UnidadResponsable.Id ';
-                query += ' HAVING ClaveCompleta = ?';
-            let params = [idVersion,clavePartidaGenerica,ClaveUnidadResponsable];
+            let query = 'SELECT VersionesPresupuesto.*, SUM(Monto) AS Monto FROM VersionesPresupuesto  '
+                    +'JOIN ObjetoDeGasto ON VersionPresupuesto = VersionesPresupuesto.Id '
+                    +'JOIN ( '
+                    +'	SELECT UnidadResponsable.Id, CONCAT(UnidadPresupuestal.Clave,"-",UnidadResponsable.Clave) AS ClaveCompleta '
+                    +'	FROM UnidadResponsable '
+                    +'	JOIN UnidadPresupuestal ON UnidadPresupuestal.Id=UnidadResponsable.UnidadPresupuestal '
+                    +'	HAVING ClaveCompleta = ? '
+                    +') AS UnidadResponsable ON UnidadResponsable.Id=ObjetoDeGasto.UnidadResponsable '
+                    +'JOIN PartidasGenericas ON PartidasGenericas.Id=ObjetoDeGasto.PartidaGenerica  '
+                    +'WHERE VersionesPresupuesto.Id IN ('+idsVersiones.join(',')+') '
+                    +'AND PartidasGenericas.Clave=? '
+                    +'GROUP BY VersionesPresupuesto.Id ';
+            let params = [ClaveUnidadResponsable,clavePartidaGenerica];
 
             const [results] = await connection.query(query,params)
             result=results.map((row) => {
-                let unidadResponsable=new UnidadResponsable();
-                unidadResponsable.Id=row.Id;
-                unidadResponsable.Clave=row.ClaveCompleta;
-                unidadResponsable.Nombre=row.Nombre;
-                unidadResponsable.UnidadPresupuestal=row.UnidadPresupuestal;
-                unidadResponsable.OtrosNombres=row.OtrosNombres;
-                unidadResponsable.Monto=row.Monto;
-                return unidadResponsable;
+                let versionPresupuesto = new VersionPresupuesto();
+                versionPresupuesto.Id  = row.Id;
+                versionPresupuesto.Estado = row.Estado;
+                versionPresupuesto.Anio = row.Anio;
+                versionPresupuesto.Tipo = row.Tipo;
+                versionPresupuesto.Descripcion = row.Descripcion;
+                versionPresupuesto.Fecha = row.Fecha;
+                versionPresupuesto.Actual = true;
+                if(row.Actual==0){
+                    versionPresupuesto.Actual = false;
+                }
+                delete versionPresupuesto.ObjetoGasto;
+                delete versionPresupuesto.ProgramaPresupuestal;
+                versionPresupuesto.Monto = row.Monto;
+                return versionPresupuesto;
             });
             return result;
         } catch (err) {
@@ -207,27 +255,39 @@ export default class UnidadesResponsables {
         }
     };
 
-    async showMontosByVersionPresupuestoClaveURObjetoGasto (idVersion,ClaveUnidadResponsable,claveObjetoGasto) {
+    async showMontosByVersionesPresupuestoClaveURObjetoGasto (idsVersiones,ClaveUnidadResponsable,claveObjetoGasto) {
         let result=[];
         try {
-            let query = 'SELECT UnidadResponsable.*,CONCAT(UnidadPresupuestal.Clave,"-",UnidadResponsable.Clave) AS ClaveCompleta, SUM(Monto) AS Monto FROM ObjetoDeGasto '
-                query +=' JOIN UnidadResponsable ON UnidadResponsable.Id=ObjetoDeGasto.UnidadResponsable'
-                query +=' JOIN UnidadPresupuestal ON UnidadPresupuestal.Id=UnidadResponsable.UnidadPresupuestal'
-                query +=' WHERE ObjetoDeGasto.VersionPresupuesto= ? AND ObjetoDeGasto.Clave= ?'
-                query += ' GROUP BY UnidadResponsable.Id ';
-                query += ' HAVING ClaveCompleta = ?';
-            let params = [idVersion,claveObjetoGasto,ClaveUnidadResponsable];
+            let query = 'SELECT VersionesPresupuesto.*, SUM(Monto) AS Monto FROM VersionesPresupuesto  '
+                    +'JOIN ObjetoDeGasto ON VersionPresupuesto = VersionesPresupuesto.Id '
+                    +'JOIN ( '
+                    +'	SELECT UnidadResponsable.Id, CONCAT(UnidadPresupuestal.Clave,"-",UnidadResponsable.Clave) AS ClaveCompleta '
+                    +'	FROM UnidadResponsable '
+                    +'	JOIN UnidadPresupuestal ON UnidadPresupuestal.Id=UnidadResponsable.UnidadPresupuestal '
+                    +'	HAVING ClaveCompleta = ? '
+                    +') AS UnidadResponsable ON UnidadResponsable.Id=ObjetoDeGasto.UnidadResponsable '
+                    +'WHERE VersionesPresupuesto.Id IN ('+idsVersiones.join(',')+') '
+                    +'AND ObjetoDeGasto.Clave=? '
+                    +'GROUP BY VersionesPresupuesto.Id ';
+            let params = [ClaveUnidadResponsable,claveObjetoGasto];
 
             const [results] = await connection.query(query,params)
             result=results.map((row) => {
-                let unidadResponsable=new UnidadResponsable();
-                unidadResponsable.Id=row.Id;
-                unidadResponsable.Clave=row.ClaveCompleta;
-                unidadResponsable.Nombre=row.Nombre;
-                unidadResponsable.UnidadPresupuestal=row.UnidadPresupuestal;
-                unidadResponsable.OtrosNombres=row.OtrosNombres;
-                unidadResponsable.Monto=row.Monto;
-                return unidadResponsable;
+                let versionPresupuesto = new VersionPresupuesto();
+                versionPresupuesto.Id  = row.Id;
+                versionPresupuesto.Estado = row.Estado;
+                versionPresupuesto.Anio = row.Anio;
+                versionPresupuesto.Tipo = row.Tipo;
+                versionPresupuesto.Descripcion = row.Descripcion;
+                versionPresupuesto.Fecha = row.Fecha;
+                versionPresupuesto.Actual = true;
+                if(row.Actual==0){
+                    versionPresupuesto.Actual = false;
+                }
+                delete versionPresupuesto.ObjetoGasto;
+                delete versionPresupuesto.ProgramaPresupuestal;
+                versionPresupuesto.Monto = row.Monto;
+                return versionPresupuesto;
             });
             return result;
         } catch (err) {

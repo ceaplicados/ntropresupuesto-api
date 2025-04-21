@@ -39,19 +39,25 @@ router.use("/*",(req,res,next)=>{
     }
 });
 
+// Determinar las versiones de presupuesto a utilizar
 router.use(/^(?!(\/|\/URs|\/UPs)$).*$/,( req, res, next ) => {
-    let versionPresupuesto=new VersionPresupuesto();
+    let versionesPresupuesto=new VersionPresupuesto();
     const getVersionPresupuesto = new Promise((resolve) => {
         if(req.query.v){
-            versionesPresupuesto_controller.show(req.query.v)
+            const versiones=req.query.v.split(',');
+            versionesPresupuesto_controller.showByIds(versiones)
             .then(
                 (value) => {
-                    versionPresupuesto=value;
-                    if(versionPresupuesto.Id){
-                        //resolve(versionPresupuesto.Id);
-                        res.locals.versionPresupuesto=versionPresupuesto;
+                    versionesPresupuesto=value;
+                    if(versionesPresupuesto.length>1){
+                        res.locals.versionPresupuesto=versionesPresupuesto;
                         next();
-                    }else{
+                    }
+                    else if(versionesPresupuesto.length==1){
+                        res.locals.versionPresupuesto=versionesPresupuesto[0];
+                        next();
+                    }
+                    else{
                         res.status(404).json({
                             message: "Version de presupuesto no encontrada"
                         })
@@ -66,7 +72,7 @@ router.use(/^(?!(\/|\/URs|\/UPs)$).*$/,( req, res, next ) => {
             versionesPresupuesto_controller.getActiva(res.locals.estado.Id,anio)
             .then( 
                 (value) => {
-                    versionPresupuesto=value;
+                    let versionPresupuesto=value;
                     if(versionPresupuesto.Id){
                         res.locals.versionPresupuesto=versionPresupuesto;
                         next();

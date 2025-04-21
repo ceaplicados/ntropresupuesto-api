@@ -25,6 +25,31 @@ export default class ObjetosDeGasto {
         return result;
     }
 
+    async getByClave (claveObjetoDeGasto,versionPresupuesto) {
+        let response=new ObjetoDeGasto();
+        let query='SELECT * FROM `ObjetoDeGasto` '
+        query+='WHERE `Clave`= ? AND `VersionPresupuesto`= ?';
+        let params = [claveObjetoDeGasto,versionPresupuesto];
+        try {
+            const [results] = await connection.query(query, params);
+            const result = results.map((row) => {
+                let objetoDeGasto = new ObjetoDeGasto();
+                objetoDeGasto.Id = row.Id;
+                objetoDeGasto.Clave = row.Clave;
+                objetoDeGasto.Nombre = row.Nombre;
+                delete objetoDeGasto.Monto;
+                objetoDeGasto.PartidaGenerica = row.PartidaGenerica;
+                return objetoDeGasto;
+            });
+            if(result.length>0){
+                response=result[0]
+            }
+        } catch (err) {
+            console.log(err);
+        }
+        return response;
+    }
+
     async getByVersion (idVersion,claveObjetoDeGasto) {
         let result=[];
         let query='SELECT * FROM `ObjetoDeGasto` '

@@ -27,6 +27,31 @@ export default class ConceptosGenerales {
         return result;
     }
 
+    async getByClave (claveConceptoGeneral) {
+        let result=[];
+        let query='SELECT * FROM `ConceptosGenerales` '
+        query+='WHERE `Clave`= ? ;';
+        let params = [claveConceptoGeneral];
+        try {
+            const [results] = await connection.query(query, params);
+            result = results.map((row) => {
+                let conceptoGeneral = new ConceptoGeneral();
+                conceptoGeneral.Id = row.Id;
+                conceptoGeneral.Clave = row.Clave;
+                conceptoGeneral.Nombre = row.Nombre;
+                delete conceptoGeneral.Monto;
+                conceptoGeneral.CapituloGasto = row.CapituloGasto;
+                return conceptoGeneral;
+            });
+        } catch (err) {
+            console.log(err);
+        }
+        if(result.length==1){
+            result=result[0];
+        }
+        return result;
+    }
+
     async getByVersion (idVersion,claveConceptoGeneral) {
         let result=[];
         let query='SELECT `ConceptosGenerales`.*, SUM(`Monto`) AS Monto FROM `ConceptosGenerales` '
