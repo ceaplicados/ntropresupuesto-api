@@ -65,25 +65,34 @@ router.use(/^(?!(\/|\/URs|\/UPs)$).*$/,( req, res, next ) => {
                 }
             )
         }else{
-            let anio=null;
+            let anios=[null];
             if(req.query.a){
-                anio=req.query.a;
+                anios=req.query.a.split(',');
             }
-            versionesPresupuesto_controller.getActiva(res.locals.estado.Id,anio)
-            .then( 
-                (value) => {
-                    let versionPresupuesto=value;
-                    if(versionPresupuesto.Id){
-                        res.locals.versionPresupuesto=versionPresupuesto;
-                        next();
-                    }else{
-                        res.status(404).json({
-                            message: "No existe una version de presupuesto para el año solicitado"
-                        })
-                    }
-                }, 
-                (error) => res.status(500).json({message: 'Error al consultar la BDD'})
-            )
+            const getVersiones = async (anios) => {
+                let versiones = await Promise.all(
+                    anios.map((anio) => {
+                        return versionesPresupuesto_controller.getActiva(res.locals.estado.Id,anio)
+                        .then( value => value)
+                    })
+                )
+                versiones=versiones.filter((version) => { return version.Id })
+                if(versiones.length==1){
+                    res.locals.versionPresupuesto=versiones[0];
+                    next();
+                }
+                else if(versiones.length>1){
+                    res.locals.versionPresupuesto=versiones;
+                    next();
+                }
+                else{
+                    res.status(404).json({
+                        message: "No existe una version de presupuesto para los años solicitados"
+                    }) 
+                }
+            }   
+            getVersiones(anios)
+
         }
     })
 });
