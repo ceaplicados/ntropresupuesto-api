@@ -1,5 +1,6 @@
 import connection from '../../config/db.conf.js';
 import ConceptoGeneral from '../models/ConceptoGeneral.js';
+import VersionPresupuesto from '../models/VersionPresupuesto.js';
 
 export default class ConceptosGenerales {
     async getById (idConceptoGeneral) {
@@ -52,6 +53,29 @@ export default class ConceptosGenerales {
         return result;
     }
 
+    async getByClaveCapituloGasto (claveCapituloGasto) {
+        let result=[];
+        let query='SELECT ConceptosGenerales.* FROM `ConceptosGenerales` '
+            +'JOIN CapitulosGasto ON CapitulosGasto.Id=ConceptosGenerales.CapituloGasto '
+            +'WHERE CapitulosGasto.Clave= ? ;';
+        let params = [claveCapituloGasto];
+        try {
+            const [results] = await connection.query(query, params);
+            result = results.map((row) => {
+                let conceptoGeneral = new ConceptoGeneral();
+                conceptoGeneral.Id = row.Id;
+                conceptoGeneral.Clave = row.Clave;
+                conceptoGeneral.Nombre = row.Nombre;
+                delete conceptoGeneral.Monto;
+                conceptoGeneral.CapituloGasto = row.CapituloGasto;
+                return conceptoGeneral;
+            });
+        } catch (err) {
+            console.log(err);
+        }
+        return result;
+    }
+
     async getByVersion (idVersion,claveConceptoGeneral) {
         let result=[];
         let query='SELECT `ConceptosGenerales`.*, SUM(`Monto`) AS Monto FROM `ConceptosGenerales` '
@@ -83,6 +107,40 @@ export default class ConceptosGenerales {
         }
         if(result.length==1){
             result=result[0];
+        }
+        return result;
+    }
+
+    async getByVersiones (idsVersiones,claveConceptoGeneral) {
+        let result=[];
+        let query='SELECT VersionesPresupuesto.*, SUM(Monto) AS Monto FROM VersionesPresupuesto '
+                +'JOIN ObjetoDeGasto ON VersionPresupuesto = VersionesPresupuesto.Id '
+                +'JOIN PartidasGenericas ON PartidasGenericas.Id=ObjetoDeGasto.PartidaGenerica '
+                +'JOIN ConceptosGenerales ON ConceptosGenerales.Id=PartidasGenericas.ConceptoGeneral '
+                +'WHERE VersionesPresupuesto.Id IN ('+idsVersiones.join(',')+') AND ConceptosGenerales.Clave=? '
+                +'GROUP BY VersionesPresupuesto.Id';
+        let params = [claveConceptoGeneral];
+        try {
+            const [results] = await connection.query(query, params);
+            result = results.map((row) => {
+                let versionPresupuesto = new VersionPresupuesto();
+                    versionPresupuesto.Id  = row.Id;
+                    versionPresupuesto.Estado = row.Estado;
+                    versionPresupuesto.Anio = row.Anio;
+                    versionPresupuesto.Tipo = row.Tipo;
+                    versionPresupuesto.Descripcion = row.Descripcion;
+                    versionPresupuesto.Fecha = row.Fecha;
+                    versionPresupuesto.Actual = true;
+                    if(row.Actual==0){
+                        versionPresupuesto.Actual = false;
+                    }
+                    delete versionPresupuesto.ObjetoGasto;
+                    delete versionPresupuesto.ProgramaPresupuestal;
+                    versionPresupuesto.Monto = row.Monto;
+                    return versionPresupuesto;
+            });
+        } catch (err) {
+            console.log(err);
         }
         return result;
     }

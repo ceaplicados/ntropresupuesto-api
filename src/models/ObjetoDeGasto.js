@@ -1,4 +1,4 @@
-export default class PartidaGenerica{
+export default class ObjetoDeGasto{
     constructor(){
         this.Id  = null
         this.Clave = null

@@ -1,4 +1,4 @@
-export default class CapituloGasto{
+export default class ConceptoGeneral{
     constructor(){
         this.Id  = null
         this.Clave = null

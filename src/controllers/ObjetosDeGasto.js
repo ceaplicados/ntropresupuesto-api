@@ -1,5 +1,6 @@
 import connection from '../../config/db.conf.js';
 import ObjetoDeGasto from '../models/ObjetoDeGasto.js';
+import VersionPresupuesto from '../models/VersionPresupuesto.js';
 
 export default class ObjetosDeGasto {
     async getById (idObjetoDeGasto) {
@@ -25,29 +26,99 @@ export default class ObjetosDeGasto {
         return result;
     }
 
-    async getByClave (claveObjetoDeGasto,versionPresupuesto) {
+    async getByClave (claveObjetoDeGasto) {
         let response=new ObjetoDeGasto();
-        let query='SELECT * FROM `ObjetoDeGasto` '
-        query+='WHERE `Clave`= ? AND `VersionPresupuesto`= ?';
-        let params = [claveObjetoDeGasto,versionPresupuesto];
+        let query='SELECT DISTINCT Clave, Nombre, PartidaGenerica FROM `ObjetoDeGasto` '
+        query+='WHERE `Clave`= ? ORDER BY ObjetoDeGasto.Clave, ObjetoDeGasto.Nombre';
+        let params = [claveObjetoDeGasto];
         try {
             const [results] = await connection.query(query, params);
             const result = results.map((row) => {
                 let objetoDeGasto = new ObjetoDeGasto();
-                objetoDeGasto.Id = row.Id;
+                delete objetoDeGasto.Id ;
                 objetoDeGasto.Clave = row.Clave;
                 objetoDeGasto.Nombre = row.Nombre;
                 delete objetoDeGasto.Monto;
                 objetoDeGasto.PartidaGenerica = row.PartidaGenerica;
                 return objetoDeGasto;
             });
-            if(result.length>0){
-                response=result[0]
-            }
+            return result;
         } catch (err) {
             console.log(err);
         }
-        return response;
+    }
+
+    async getByClavePartidaGenerica (clavePartidaGenerica) {
+        let response=new ObjetoDeGasto();
+        let query='SELECT DISTINCT ObjetoDeGasto.Clave, ObjetoDeGasto.Nombre, ObjetoDeGasto.PartidaGenerica FROM `ObjetoDeGasto` '
+                +'JOIN `PartidasGenericas` ON `PartidasGenericas`.`Id` =  `ObjetoDeGasto`.`PartidaGenerica` '
+                +'WHERE PartidasGenericas.Clave= ? ORDER BY ObjetoDeGasto.Clave, ObjetoDeGasto.Nombre';
+        let params = [clavePartidaGenerica];
+        try {
+            const [results] = await connection.query(query, params);
+            const result = results.map((row) => {
+                let objetoDeGasto = new ObjetoDeGasto();
+                delete objetoDeGasto.Id
+                objetoDeGasto.Clave = row.Clave;
+                objetoDeGasto.Nombre = row.Nombre;
+                delete objetoDeGasto.Monto;
+                objetoDeGasto.PartidaGenerica = row.PartidaGenerica;
+                return objetoDeGasto;
+            });
+            return result;
+        } catch (err) {
+            console.log(err);
+        }
+    }
+
+
+    async getByClaveConceptoGeneral (claveConceptoGeneral) {
+        let response=new ObjetoDeGasto();
+        let query='SELECT DISTINCT ObjetoDeGasto.Clave, ObjetoDeGasto.Nombre, ObjetoDeGasto.PartidaGenerica FROM `ObjetoDeGasto` '
+                +'JOIN `PartidasGenericas` ON `PartidasGenericas`.`Id` =  `ObjetoDeGasto`.`PartidaGenerica` '
+                +'JOIN `ConceptosGenerales` ON `ConceptosGenerales`.`Id` =  `PartidasGenericas`.`ConceptoGeneral` '
+                +'WHERE ConceptosGenerales.Clave= ? ORDER BY ObjetoDeGasto.Clave, ObjetoDeGasto.Nombre';
+        let params = [claveConceptoGeneral];
+        try {
+            const [results] = await connection.query(query, params);
+            const result = results.map((row) => {
+                let objetoDeGasto = new ObjetoDeGasto();
+                delete objetoDeGasto.Id ;
+                objetoDeGasto.Clave = row.Clave;
+                objetoDeGasto.Nombre = row.Nombre;
+                delete objetoDeGasto.Monto;
+                objetoDeGasto.PartidaGenerica = row.PartidaGenerica;
+                return objetoDeGasto;
+            });
+            return result;
+        } catch (err) {
+            console.log(err);
+        }
+    }
+
+    async getByClaveCapituloGasto (claveCapituloGasto) {
+        let response=new ObjetoDeGasto();
+        let query='SELECT DISTINCT ObjetoDeGasto.Clave, ObjetoDeGasto.Nombre, ObjetoDeGasto.PartidaGenerica FROM `ObjetoDeGasto` '
+                +'JOIN `PartidasGenericas` ON `PartidasGenericas`.`Id` =  `ObjetoDeGasto`.`PartidaGenerica` '
+                +'JOIN `ConceptosGenerales` ON `ConceptosGenerales`.`Id` =  `PartidasGenericas`.`ConceptoGeneral` '
+                +'JOIN `CapitulosGasto` ON `CapitulosGasto`.`Id` =  `ConceptosGenerales`.`CapituloGasto` '
+                +'WHERE CapitulosGasto.Clave= ? ORDER BY ObjetoDeGasto.Clave, ObjetoDeGasto.Nombre';
+        let params = [claveCapituloGasto];
+        try {
+            const [results] = await connection.query(query, params);
+            const result = results.map((row) => {
+                let objetoDeGasto = new ObjetoDeGasto();
+                delete objetoDeGasto.Id ;
+                objetoDeGasto.Clave = row.Clave;
+                objetoDeGasto.Nombre = row.Nombre;
+                delete objetoDeGasto.Monto;
+                objetoDeGasto.PartidaGenerica = row.PartidaGenerica;
+                return objetoDeGasto;
+            });
+            return result;
+        } catch (err) {
+            console.log(err);
+        }
     }
 
     async getByVersion (idVersion,claveObjetoDeGasto) {
@@ -73,6 +144,38 @@ export default class ObjetosDeGasto {
                 objetoDeGasto.Monto = row.Monto;
                 delete objetoDeGasto.PartidaGenerica;
                 return objetoDeGasto;
+            });
+        } catch (err) {
+            console.log(err);
+        }
+        return result;
+    }
+
+    async getByVersiones (idsVersiones,claveObjetoGasto,nombreObjetoGasto) {
+        let result=[];
+        let query='SELECT VersionesPresupuesto.*, SUM(Monto) AS Monto FROM VersionesPresupuesto '
+                +'JOIN ObjetoDeGasto ON VersionPresupuesto = VersionesPresupuesto.Id '
+                +'WHERE VersionesPresupuesto.Id IN ('+idsVersiones.join(',')+') AND ObjetoDeGasto.Clave=? AND ObjetoDeGasto.Nombre=? '
+                +'GROUP BY VersionesPresupuesto.Id';
+        let params = [claveObjetoGasto,nombreObjetoGasto];
+        try {
+            const [results] = await connection.query(query, params);
+            result = results.map((row) => {
+                let versionPresupuesto = new VersionPresupuesto();
+                    versionPresupuesto.Id  = row.Id;
+                    versionPresupuesto.Estado = row.Estado;
+                    versionPresupuesto.Anio = row.Anio;
+                    versionPresupuesto.Tipo = row.Tipo;
+                    versionPresupuesto.Descripcion = row.Descripcion;
+                    versionPresupuesto.Fecha = row.Fecha;
+                    versionPresupuesto.Actual = true;
+                    if(row.Actual==0){
+                        versionPresupuesto.Actual = false;
+                    }
+                    delete versionPresupuesto.ObjetoGasto;
+                    delete versionPresupuesto.ProgramaPresupuestal;
+                    versionPresupuesto.Monto = row.Monto;
+                    return versionPresupuesto;
             });
         } catch (err) {
             console.log(err);
