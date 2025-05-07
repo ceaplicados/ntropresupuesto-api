@@ -53,8 +53,9 @@ router.get("/Presupuesto/:ClaveUnidadResponsable",(req,res) => {
     }
     const getPresupuesto = async (idVersiones,claveUR) => {
         try {
-            const response = await unidadesResponsables.showMontosByVersionesPresupuestoClaveUR(idVersiones,claveUR);
-            res.status(200).json(response);
+            const ur = await unidadesResponsables.getByClaveEstado(claveUR,res.locals.estado.Id);
+            const presupuestos = await unidadesResponsables.showMontosByVersionesPresupuestoClaveUR(idVersiones,claveUR);
+            res.status(200).json({unidadResponsable : ur, presupuesto : presupuestos});
         } catch (error) {
             res.status(500).json({message: 'Error al consultar la BDD'});
         }        

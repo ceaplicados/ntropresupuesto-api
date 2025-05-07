@@ -84,10 +84,10 @@ export default class VersionesPresupuesto {
     async showByEstado (idEstado,anios) {
         let result=[];
         try {
-            let query='SELECT * FROM `VersionesPresupuesto` WHERE `Estado` = ? ORDER BY Anio DESC, Actual DESC, Fecha ASC';
+            let query='SELECT * FROM `VersionesPresupuesto` WHERE `Estado` = ? ORDER BY Anio ASC, Actual DESC, Fecha ASC';
             let params=[idEstado];
             if(anios){
-                query = 'SELECT * FROM `VersionesPresupuesto` WHERE `Estado` = ? AND Anio IN (?) AND Actual=1 ORDER BY Anio,Fecha';
+                query = 'SELECT * FROM `VersionesPresupuesto` WHERE `Estado` = ? AND Anio IN (?) AND Actual=1 ORDER BY Anio ASC,Fecha';
                 params = [idEstado,anios];
             }
             const [results] = await connection.query(query,params)

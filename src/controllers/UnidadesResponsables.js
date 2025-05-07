@@ -31,6 +31,35 @@ export default class UnidadesResponsables {
         return result;
     };
 
+    async getByClaveEstado (claveUnidadResponsable,idEstado) {
+        let result=new UnidadResponsable();
+        try {
+            const [results] = await connection.query(
+                'SELECT UnidadResponsable.*, CONCAT(UnidadPresupuestal.Clave,"-",UnidadResponsable.Clave) AS ClaveCompleta FROM UnidadResponsable '
+                    +' JOIN UnidadPresupuestal ON UnidadPresupuestal.Id=UnidadResponsable.UnidadPresupuestal '
+                    +' WHERE UnidadPresupuestal.Estado=?'
+                    +' HAVING ClaveCompleta=?;',
+                [idEstado,claveUnidadResponsable])
+            
+            result=results.map((row) => {
+                let unidadResponsable=new UnidadResponsable();
+                unidadResponsable.Id=row.Id;
+                unidadResponsable.Clave=row.ClaveCompleta;
+                unidadResponsable.Nombre=row.Nombre;
+                unidadResponsable.UnidadPresupuestal=row.UnidadPresupuestal;
+                unidadResponsable.OtrosNombres=row.OtrosNombres;
+                delete unidadResponsable.Monto;
+                return unidadResponsable;
+            });
+            if(result.length>0){
+                result=result[0];
+            }
+        }catch (err) {
+            console.log(err);
+        }
+        return result;
+    };
+
     async getByEstado (idEstado) {
         let result=[];
         try {
@@ -64,14 +93,15 @@ export default class UnidadesResponsables {
                 query +=' JOIN UnidadResponsable ON UnidadResponsable.Id=ObjetoDeGasto.UnidadResponsable'
                 query +=' JOIN UnidadPresupuestal ON UnidadPresupuestal.Id=UnidadResponsable.UnidadPresupuestal'
                 query +=' WHERE ObjetoDeGasto.VersionPresupuesto= ? '
-            let params = [idVersion];
-
-            if (idUnidadResponsable) {
-                query += ' AND ObjetoDeGasto.UnidadResponsable=?';
-                params.push(idUnidadResponsable);
-            }
-            
-            query += ' GROUP BY UnidadResponsable.Id ';
+                let params = [idVersion];
+                
+                if (idUnidadResponsable) {
+                    query += ' AND ObjetoDeGasto.UnidadResponsable=?';
+                    params.push(idUnidadResponsable);
+                }
+                
+                query += ' GROUP BY UnidadResponsable.Id ';
+                query += ' ORDER BY ClaveCompleta '
             
             const [results] = await connection.query(query,params)
             result=results.map((row) => {
@@ -102,7 +132,8 @@ export default class UnidadesResponsables {
                     +'	HAVING ClaveCompleta = ? '
                     +') AS UnidadResponsable ON UnidadResponsable.Id=ObjetoDeGasto.UnidadResponsable '
                     +'WHERE VersionesPresupuesto.Id IN ('+idsVersiones.join(',')+') '
-                    +'GROUP BY VersionesPresupuesto.Id ';
+                    +'GROUP BY VersionesPresupuesto.Id '
+                    +'ORDER BY VersionesPresupuesto.Anio ASC, VersionesPresupuesto.Fecha ASC ';
             let params = [ClaveUnidadResponsable];
 
             const [results] = await connection.query(query,params)
@@ -111,7 +142,7 @@ export default class UnidadesResponsables {
                 versionPresupuesto.Id  = row.Id;
                 versionPresupuesto.Estado = row.Estado;
                 versionPresupuesto.Anio = row.Anio;
-                versionPresupuesto.Tipo = row.Tipo;
+                versionPresupuesto.Tipo = row.Nombre;
                 versionPresupuesto.Descripcion = row.Descripcion;
                 versionPresupuesto.Fecha = row.Fecha;
                 versionPresupuesto.Actual = true;
@@ -154,7 +185,7 @@ export default class UnidadesResponsables {
                 versionPresupuesto.Id  = row.Id;
                 versionPresupuesto.Estado = row.Estado;
                 versionPresupuesto.Anio = row.Anio;
-                versionPresupuesto.Tipo = row.Tipo;
+                versionPresupuesto.Tipo = row.Nombre;
                 versionPresupuesto.Descripcion = row.Descripcion;
                 versionPresupuesto.Fecha = row.Fecha;
                 versionPresupuesto.Actual = true;
@@ -196,7 +227,7 @@ export default class UnidadesResponsables {
                 versionPresupuesto.Id  = row.Id;
                 versionPresupuesto.Estado = row.Estado;
                 versionPresupuesto.Anio = row.Anio;
-                versionPresupuesto.Tipo = row.Tipo;
+                versionPresupuesto.Tipo = row.Nombre;
                 versionPresupuesto.Descripcion = row.Descripcion;
                 versionPresupuesto.Fecha = row.Fecha;
                 versionPresupuesto.Actual = true;
@@ -237,7 +268,7 @@ export default class UnidadesResponsables {
                 versionPresupuesto.Id  = row.Id;
                 versionPresupuesto.Estado = row.Estado;
                 versionPresupuesto.Anio = row.Anio;
-                versionPresupuesto.Tipo = row.Tipo;
+                versionPresupuesto.Tipo = row.Nombre;
                 versionPresupuesto.Descripcion = row.Descripcion;
                 versionPresupuesto.Fecha = row.Fecha;
                 versionPresupuesto.Actual = true;
@@ -277,7 +308,7 @@ export default class UnidadesResponsables {
                 versionPresupuesto.Id  = row.Id;
                 versionPresupuesto.Estado = row.Estado;
                 versionPresupuesto.Anio = row.Anio;
-                versionPresupuesto.Tipo = row.Tipo;
+                versionPresupuesto.Tipo = row.Nombre;
                 versionPresupuesto.Descripcion = row.Descripcion;
                 versionPresupuesto.Fecha = row.Fecha;
                 versionPresupuesto.Actual = true;

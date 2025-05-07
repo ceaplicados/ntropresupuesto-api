@@ -127,7 +127,7 @@ export default class ConceptosGenerales {
                     versionPresupuesto.Id  = row.Id;
                     versionPresupuesto.Estado = row.Estado;
                     versionPresupuesto.Anio = row.Anio;
-                    versionPresupuesto.Tipo = row.Tipo;
+                    versionPresupuesto.Tipo = row.Nombre;
                     versionPresupuesto.Descripcion = row.Descripcion;
                     versionPresupuesto.Fecha = row.Fecha;
                     versionPresupuesto.Actual = true;
