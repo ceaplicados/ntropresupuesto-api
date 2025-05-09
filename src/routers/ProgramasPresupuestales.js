@@ -33,4 +33,34 @@ router.get("/",(req,res) => {
     }
 });
 
+
+// Presupuesto(s) para un programa presupuestal
+router.get("/:ClaveProgramaPresupuestal",(req,res) => {
+    let clavePrograma=req.params.ClaveProgramaPresupuestal;
+    let idVersiones=[];
+    if(Array.isArray(res.locals.versionPresupuesto)){
+        idVersiones=res.locals.versionPresupuesto.map((version) => {
+            return version.Id;
+        })
+    }else{
+        idVersiones.push(res.locals.versionPresupuesto.Id);
+    }
+    const getPresupuesto = async (idVersiones,clavePrograma) => {
+        try {
+            const programa = await programasPresupuestales.getByClaveEstado(clavePrograma,res.locals.estado.Id);
+            if(programa.Id){
+                const presupuestos = await programasPresupuestales.showMontosByVersionesPresupuestoClavePP(idVersiones,clavePrograma);
+                res.status(200).json({programa : programa, presupuesto : presupuestos});
+            }
+            else{
+                res.status(404).json({message: 'No se encontró el programa presupuestal'});
+            }
+        } catch (error) {
+            res.status(500).json({message: 'Error al consultar la BDD'});
+            console.log(error);
+        }
+    }
+    getPresupuesto(idVersiones,clavePrograma);
+});
+
 export default router;

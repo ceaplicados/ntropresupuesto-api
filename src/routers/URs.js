@@ -5,6 +5,7 @@ import CapitulosDeGasto from '../controllers/CapitulosDeGasto.js';
 import ConceptosGenerales from '../controllers/ConceptosGenerales.js';
 import PartidasGenericas from '../controllers/PartidasGenericas.js';
 import ObjetosDeGasto from '../controllers/ObjetosDeGasto.js';
+import ProgramasPresupuestales from '../controllers/ProgramasPresupuestales.js';
 
 const router = express.Router();
 const unidadesResponsables = new UnidadesResponsables();
@@ -12,6 +13,7 @@ const capitulosDeGasto = new CapitulosDeGasto();
 const conceptosGenerales = new ConceptosGenerales();
 const partidasGenericas = new PartidasGenericas();
 const objetosDeGasto = new ObjetosDeGasto();
+const programasPresupuestales = new ProgramasPresupuestales();
 
 // Listado de todas las Unidades Responsables
 router.get("/",(req,res) => {
@@ -117,5 +119,26 @@ router.get("/Presupuesto/:ClaveUnidadResponsable/:Filtro",(req,res) => {
     getPresupuesto(claveUR,filtro,idVersiones);
 })
 
+// Programas para una unidad responsable
+router.get("/Programas/:ClaveUnidadResponsable",(req,res) => {
+    let claveUR=req.params.ClaveUnidadResponsable;
+    let idVersiones=[];
+    if(Array.isArray(res.locals.versionPresupuesto)){
+        idVersiones=res.locals.versionPresupuesto.map((version) => {
+            return version.Id;
+        })
+    }else{
+        idVersiones.push(res.locals.versionPresupuesto.Id);
+    }
+    const getPresupuesto = async (idVersion,claveUR) => {
+        try {
+            const programas = await programasPresupuestales.showMontosByVersionClaveUR(idVersion,claveUR);
+            res.status(200).json(programas);
+        } catch (error) {
+            res.status(500).json({message: 'Error al consultar la BDD'});
+        }        
+    }
+    getPresupuesto(idVersiones[0],claveUR);
+})
 
 export default router;
