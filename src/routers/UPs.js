@@ -31,7 +31,15 @@ router.get("/Presupuesto/:ClaveUnidadPresupuestal",(req,res) => {
     const claveUP=req.params.ClaveUnidadPresupuestal;
     const fetchData = async (claveUP) => {
         try {
-            const presupuestos = await unidadesPresupuestales.showMontosByVersionPresupuestoClaveUP(res.locals.versionPresupuesto.Id,claveUP);
+            let idVersiones=[];
+            if(Array.isArray(res.locals.versionPresupuesto)){
+                for(let i=0;i<res.locals.versionPresupuesto.length;i++){
+                    idVersiones.push(res.locals.versionPresupuesto[i].Id);
+                }
+            }else{
+                idVersiones.push(res.locals.versionPresupuesto.Id);
+            }
+            const presupuestos = await unidadesPresupuestales.showMontosByVersionPresupuestoClaveUP(idVersiones,claveUP);
             const unidadPresupuestal= await unidadesPresupuestales.getByClaveEstado(claveUP,res.locals.estado.Id);
             res.status(200).json({
                 unidadPresupuestal: unidadPresupuestal,

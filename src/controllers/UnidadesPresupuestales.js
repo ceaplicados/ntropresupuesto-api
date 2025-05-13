@@ -1,5 +1,6 @@
 import connection from '../../config/db.conf.js';
 import UnidadPresupuestal from '../models/UnidadPresupuestal.js';
+import VersionPresupuesto from '../models/VersionPresupuesto.js';
 
 export default class UnidadesPresupuestales {
     async getById (idUnidadPresupuestal) {
@@ -116,29 +117,37 @@ export default class UnidadesPresupuestales {
         return result;
     }
 
-    async showMontosByVersionPresupuestoClaveUP (idVersion,claveUnidadPresupuestal) {
+    async showMontosByVersionPresupuestoClaveUP (idsVersiones,claveUnidadPresupuestal) {
         let result=[];
         try {
-            let query = "SELECT `UnidadPresupuestal`.*, SUM(`Monto`) AS Monto FROM `UnidadPresupuestal` "
-            query+=" JOIN `UnidadResponsable` ON `UnidadPresupuestal`.`Id`=`UnidadResponsable`.`UnidadPresupuestal`"
-            query+=" JOIN `ObjetoDeGasto` ON `UnidadResponsable`.`Id` =  `ObjetoDeGasto`.`UnidadResponsable` "
-            query+=" WHERE `VersionPresupuesto`= ?";
+            let query = "SELECT `VersionesPresupuesto`.*, SUM(`Monto`) AS Monto FROM `ObjetoDeGasto` "
+            query+=" JOIN `VersionesPresupuesto` ON `VersionesPresupuesto`.`Id` =  `ObjetoDeGasto`.`VersionPresupuesto` "
+            query+=" JOIN `UnidadResponsable` ON `UnidadResponsable`.`Id` =  `ObjetoDeGasto`.`UnidadResponsable` "
+            query+=" JOIN `UnidadPresupuestal` ON `UnidadPresupuestal`.`Id`=`UnidadResponsable`.`UnidadPresupuestal`"
+            query+=" WHERE `VersionPresupuesto`IN ("+idsVersiones.join(',')+")";
             query+=" AND UnidadPresupuestal.Clave=? "
-            query+=" GROUP BY `UnidadPresupuestal`.`Id`;";
+            query+=" GROUP BY `VersionesPresupuesto`.`Id`;";
             
-            let params=[idVersion,claveUnidadPresupuestal];
+            let params=[claveUnidadPresupuestal];
             
             const [results] = await connection.query(query,params)
             
                 result=results.map((row) => {
-                let unidadPresupuestal=new UnidadPresupuestal();
-                unidadPresupuestal.Id=row.Id;
-                unidadPresupuestal.Clave=row.Clave;
-                unidadPresupuestal.Nombre=row.Nombre;
-                unidadPresupuestal.Estado=row.Estado;
-                unidadPresupuestal.Monto=row.Monto;
-                unidadPresupuestal.UnidadesResponsables=row.UnidadesResponsables;
-                return unidadPresupuestal;
+                    let versionPresupuesto = new VersionPresupuesto();
+                    versionPresupuesto.Id  = row.Id;
+                    versionPresupuesto.Estado = row.Estado;
+                    versionPresupuesto.Anio = row.Anio;
+                    versionPresupuesto.Tipo = row.Nombre;
+                    versionPresupuesto.Descripcion = row.Descripcion;
+                    versionPresupuesto.Fecha = row.Fecha;
+                    versionPresupuesto.Actual = true;
+                    if(row.Actual==0){
+                        versionPresupuesto.Actual = false;
+                    }
+                    delete versionPresupuesto.ObjetoGasto;
+                    delete versionPresupuesto.ProgramaPresupuestal;
+                    versionPresupuesto.Monto = row.Monto;
+                    return versionPresupuesto;
             });
             
         }catch (err) {
