@@ -32,13 +32,13 @@ Listado histórico de todas las Unidades Presupuestales en el estado.
 Listado las Unidades Presupuestales con el monto de presupuesto a pesos corrientes, por default arroja la última versión disponible. Se puede especificar el año deseado (a) o la versión del presupuesto (v) como variables de la URL.
 
 ### GET /CÓDIGO-DEL-ESTADO/UPs/Presupuesto?/:ClaveUnidadPresupuestal{v=VERSION_DEL_PRESUPUESTO,a=AÑO_DEL_PRESUPUESTO}
-Presupuesto agrupado por Unidad Presupuestal a pesos corrientes para la Unidad Presupuestal definida en :ClaveUnidadPresupuestal, por default arroja la última versión disponible. Se puede especificar el año deseado (a) o la versión del presupuesto (v) como variables de la URL.
+Presupuesto agrupado por Versión del Presupuesto a pesos corrientes para la Unidad Presupuestal definida en :ClaveUnidadPresupuestal, por default arroja la última versión disponible. Se puedes especificar los años deseados (a) o las versiones del presupuesto (v) separados por comas como variables de la URL.
 
 ### GET /CÓDIGO-DEL-ESTADO/UPs/Presupuesto/:ClaveUnidadPresupuestal/:Filtro?{v=VERSION_DEL_PRESUPUESTO,a=AÑO_DEL_PRESUPUESTO}
 Presupuesto a pesos corrientes de la Unidad Presupuestal definida en :ClaveUnidadPresupuestal para el filtro especificado, el cual puede ser la clave de un Objeto de Gasto, Partida Genérica, Concepto General o de un Capítulo de Gasto, por default arroja la última versión disponible. Se puede especificar el año deseado (a) o la versión del presupuesto (v) como variables de la URL.
 
-### GET /CÓDIGO-DEL-ESTADO/URs/
-Listado histórico de todas las Unidades Responsables en el estado.
+### GET /CÓDIGO-DEL-ESTADO/URs?{q=BÚSQUEDA}
+Listado histórico de todas las Unidades Responsables en el estado. Se puede especificar un término de búsqueda como variable (q) de la URL.
 
 ### GET /CÓDIGO-DEL-ESTADO/URs/Presupuesto?{v=VERSION_DEL_PRESUPUESTO,a=AÑO_DEL_PRESUPUESTO}
 Presupuesto agrupado por Unidad Responsable a pesos corrientes, por default arroja la última versión disponible. Se puede especificar el año deseado (a) o la versión del presupuesto (v) como variables de la URL.
@@ -47,7 +47,7 @@ Presupuesto agrupado por Unidad Responsable a pesos corrientes, por default arro
 Presupuesto agrupado por Versión de Presupuesto a pesos corrientes para la Unidad Responsable definida en :ClaveUnidadResponsable, por default arroja la última versión disponible. Se puedes especificar los años deseados (a) o las versiones del presupuesto (v) separados por comas como variables de la URL.
 
 ### GET /CÓDIGO-DEL-ESTADO/URs/Presupuesto/:ClaveUnidadResponsable/:Filtro?{v=VERSION_DEL_PRESUPUESTO,a=AÑO_DEL_PRESUPUESTO}
-Presupuesto a pesos corrientes agrupado por Versión de PResupuesto de la Unidad Responsable definida en :ClaveUnidadResponsable para el filtro especificado, el cual puede ser la clave de un Objeto de Gasto, Partida Genérica, Concepto General o de un Capítulo de Gasto, por default arroja la última versión disponible. Se pueden especificar los años deseados (a) o las versiones del presupuesto (v) separados por comas como variables de la URL.
+Presupuesto a pesos corrientes agrupado por Versión de Presupuesto de la Unidad Responsable definida en :ClaveUnidadResponsable para el filtro especificado, el cual puede ser la clave de un Objeto de Gasto, Partida Genérica, Concepto General o de un Capítulo de Gasto, por default arroja la última versión disponible. Se pueden especificar los años deseados (a) o las versiones del presupuesto (v) separados por comas como variables de la URL.
 
 ### GET /CÓDIGO-DEL-ESTADO/URs/Programas/:ClaveUnidadResponsable?{v=VERSION_DEL_PRESUPUESTO,a=AÑO_DEL_PRESUPUESTO}
 Listado de Programas Presupuestales con su presupuesto asignado a pesos corrientes para la Unidad Responsable definida en :ClaveUnidadResponsable.  Por default arroja la última versión disponible. Se puedes especificar el año deseado (a) o la versión del presupuesto (v) como variables de la URL.

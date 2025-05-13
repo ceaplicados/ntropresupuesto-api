@@ -18,8 +18,12 @@ const programasPresupuestales = new ProgramasPresupuestales();
 // Listado de todas las Unidades Responsables
 router.get("/",(req,res) => {
     let result=new UnidadResponsable();
-    
-    unidadesResponsables.getByEstado(res.locals.estado.Id)
+    let q=null;
+    if(req.query.q){
+        q=req.query.q;
+    }
+
+    unidadesResponsables.getByEstado(res.locals.estado.Id,q)
     .then(
         (value) => {
             res.status(200).json(value)

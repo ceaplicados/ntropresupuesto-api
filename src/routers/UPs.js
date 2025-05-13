@@ -28,17 +28,23 @@ router.get("/Presupuesto",(req,res) => {
 })
 
 router.get("/Presupuesto/:ClaveUnidadPresupuestal",(req,res) => {
-    let claveUP=req.params.ClaveUnidadPresupuestal;
-    unidadesPresupuestales.showMontosByVersionPresupuestoClaveUP(res.locals.versionPresupuesto.Id,claveUP)
-    .then(
-        (value) => {
+    const claveUP=req.params.ClaveUnidadPresupuestal;
+    const fetchData = async (claveUP) => {
+        try {
+            const presupuestos = await unidadesPresupuestales.showMontosByVersionPresupuestoClaveUP(res.locals.versionPresupuesto.Id,claveUP);
+            const unidadPresupuestal= await unidadesPresupuestales.getByClaveEstado(claveUP,res.locals.estado.Id);
             res.status(200).json({
+                unidadPresupuestal: unidadPresupuestal,
                 versionPresupuesto: res.locals.versionPresupuesto,
-                presupuesto: value
+                presupuestos: presupuestos
             })
-        },
-        (error) => res.status(500).json({message: 'Error al consultar la BDD'})
-    )
+        }
+        catch (error) {
+            res.status(500).json({message: 'Error al consultar la BDD'})
+        }
+        
+    }
+    fetchData(claveUP);
 })
 
 router.get("/Presupuesto/:ClaveUnidadPresupuestal/:Filtro",(req,res) => {

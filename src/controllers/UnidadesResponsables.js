@@ -60,15 +60,23 @@ export default class UnidadesResponsables {
         return result;
     };
 
-    async getByEstado (idEstado) {
+    async getByEstado (idEstado,q) {
         let result=[];
         try {
-            const [results] = await connection.query(
-                'SELECT UnidadResponsable.*, CONCAT(UnidadPresupuestal.Clave,"-",UnidadResponsable.Clave) AS ClaveCompleta FROM UnidadResponsable '
+            let query='SELECT UnidadResponsable.*, CONCAT(UnidadPresupuestal.Clave,"-",UnidadResponsable.Clave) AS ClaveCompleta FROM UnidadResponsable '
                     +' JOIN UnidadPresupuestal ON UnidadPresupuestal.Id=UnidadResponsable.UnidadPresupuestal '
                     +' WHERE UnidadPresupuestal.Estado=?'
-                    +' ORDER BY ClaveCompleta ',
-                [idEstado])
+                    +' ORDER BY ClaveCompleta ';
+            let params=[idEstado];
+            if(q){
+                query='SELECT UnidadResponsable.*, CONCAT(UnidadPresupuestal.Clave,"-",UnidadResponsable.Clave) AS ClaveCompleta FROM UnidadResponsable '
+                    +' JOIN UnidadPresupuestal ON UnidadPresupuestal.Id=UnidadResponsable.UnidadPresupuestal '
+                    +' WHERE UnidadPresupuestal.Estado=?'
+                    +' HAVING ClaveCompleta LIKE ? OR Nombre LIKE ?'
+                    +' ORDER BY ClaveCompleta ';
+                params=[idEstado,'%'+q+'%',,'%'+q+'%'];
+            }
+            const [results] = await connection.query(query,params)
             
                 result=results.map((row) => {
                 let unidadResponsable=new UnidadResponsable();

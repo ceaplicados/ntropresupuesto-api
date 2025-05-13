@@ -28,6 +28,33 @@ export default class UnidadesPresupuestales {
         }
         return result;
     };
+
+    async getByClaveEstado (claveUnidadPresupuestal,idEstado) {
+        let result=new UnidadPresupuestal();
+        try {
+            const [results] = await connection.query(
+                'SELECT * FROM UnidadPresupuestal '
+                    +' WHERE  Clave = ? AND Estado=?;',
+                [claveUnidadPresupuestal,idEstado])
+            
+                result=results.map((row) => {
+                let unidadPresupuestal=new UnidadPresupuestal();
+                unidadPresupuestal.Id=row.Id;
+                unidadPresupuestal.Clave=row.Clave;
+                unidadPresupuestal.Nombre=row.Nombre;
+                unidadPresupuestal.Estado=row.Estado;
+                delete unidadPresupuestal.Monto;
+                delete unidadPresupuestal.UnidadesResponsables;
+                return unidadPresupuestal;
+            });
+            if(results.length>0){
+                result=results[0];
+            }
+        }catch (err) {
+            console.log(err);
+        }
+        return result;
+    };
     
     async getByEstado (idEstado) {
         let result=[];
