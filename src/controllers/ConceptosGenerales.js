@@ -118,7 +118,7 @@ export default class ConceptosGenerales {
                 +'JOIN PartidasGenericas ON PartidasGenericas.Id=ObjetoDeGasto.PartidaGenerica '
                 +'JOIN ConceptosGenerales ON ConceptosGenerales.Id=PartidasGenericas.ConceptoGeneral '
                 +'WHERE VersionesPresupuesto.Id IN ('+idsVersiones.join(',')+') AND ConceptosGenerales.Clave=? '
-                +'GROUP BY VersionesPresupuesto.Id';
+                +'GROUP BY VersionesPresupuesto.Id ORDER BY VersionesPresupuesto.Anio, VersionesPresupuesto.Anio;';
         let params = [claveConceptoGeneral];
         try {
             const [results] = await connection.query(query, params);
