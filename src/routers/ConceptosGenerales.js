@@ -40,7 +40,7 @@ router.get("/:Filtro",(req,res) => {
                         conceptos.map((concepto) => {
                             return conceptosGenerales.getByVersiones(versionesPresupuesto,concepto.Clave)
                             .then( value => {
-                                const obj={...concepto,presupuestos: value}
+                                const obj={conceptoGeneral: concepto,presupuestos: value}
                                 return obj
                             })
                         })

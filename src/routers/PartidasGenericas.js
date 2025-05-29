@@ -44,7 +44,7 @@ router.get("/:Filtro",(req,res) => {
                         conceptos.map((concepto) => {
                             return partidasGenericas.getByVersiones(versionesPresupuesto,concepto.Clave)
                             .then( value => {
-                                const obj={...concepto,presupuestos: value}
+                                const obj={partidaGenerica: concepto,presupuestos: value}
                                 return obj
                             })
                         })
