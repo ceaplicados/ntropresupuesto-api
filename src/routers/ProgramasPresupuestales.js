@@ -50,7 +50,7 @@ router.get("/:ClaveProgramaPresupuestal",(req,res) => {
             const programa = await programasPresupuestales.getByClaveEstado(clavePrograma,res.locals.estado.Id);
             if(programa.Id){
                 const presupuestos = await programasPresupuestales.showMontosByVersionesPresupuestoClavePP(idVersiones,clavePrograma);
-                res.status(200).json({programa : programa, presupuesto : presupuestos});
+                res.status(200).json({programa : programa, presupuestos : presupuestos});
             }
             else{
                 res.status(404).json({message: 'No se encontró el programa presupuestal'});

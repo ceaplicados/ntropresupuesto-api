@@ -86,6 +86,12 @@ Listado de los programas presupuestarios a pesos corrientes coincidentes con el 
 ### GET /CÓDIGO-DEL-ESTADO/Programas/:ClavePrograma?{v=VERSION_DEL_PRESUPUESTO,a=AÑO_DEL_PRESUPUESTO,b=BUSCAR}
 Presupuestos para el Programa Presupuestal especificado en :ClavePrograma a pesos corrientes.  Por default arroja la última versión disponible. Se puede especificar los años deseados (a) o las versiones del presupuesto (v) separados por comas como variables de la URL.
 
+### GET /CÓDIGO-DEL-ESTADO/Indicadores/:ClavePrograma
+Arroja los indicadores registrados para el Programa Presupuestal especificado en :ClavePrograma.
+
+### GET /CÓDIGO-DEL-ESTADO/Programas/:ClavePrograma?{v=VERSION_DEL_PRESUPUESTO,a=AÑO_DEL_PRESUPUESTO,b=BUSCAR}
+Presupuestos para el Programa Presupuestal especificado en :ClavePrograma a pesos corrientes.  Por default arroja la última versión disponible. Se puede especificar los años deseados (a) o las versiones del presupuesto (v) separados por comas como variables de la URL.
+
 ## Cuadernos
 ### GET /Cuadernos
 Listado de los cuadernos de trabajo públicos

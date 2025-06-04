@@ -10,6 +10,7 @@ import ConceptosGenerales from './ConceptosGenerales.js';
 import PartidasGenericas from './PartidasGenericas.js';
 import ObjetosDeGasto from './ObjetosDeGasto.js';
 import ProgramasPresupuestales from './ProgramasPresupuestales.js';
+import Indicadores from './Indicadores.js';
 
 const router = express.Router();
 const versionesPresupuesto_controller = new VersionesPresupuesto();
@@ -106,5 +107,6 @@ router.use("/ConceptosGenerales", ConceptosGenerales);
 router.use("/PartidasGenericas", PartidasGenericas);
 router.use("/ObjetoDeGasto", ObjetosDeGasto);
 router.use("/Programas", ProgramasPresupuestales);
+router.use("/Indicadores", Indicadores);
 
 export default router;
