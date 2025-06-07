@@ -16,6 +16,8 @@ import estados from './src/services/Estados.js'
 import dotenv from 'dotenv';
 dotenv.config({ path: './config/config.env' });
 
+import connection from './config/db.conf.js';
+
 const app = express();
 app.use(cors({
     origin: whitelist,
@@ -26,6 +28,13 @@ app.use(compression());
 app.use(express.json());
 app.use(cookieParser());
 app.use(session({secret: process.env.SESSION_SECRET,resave:true,saveUninitialized:true}));
+
+app.use(function(req, res, next) {
+  res.on('finish', function() {
+    connection.end();
+  });
+  next();
+});
 
 const codigosEstados = estados.estados.map((estado) => {return "/"+estado.Codigo});
 const loginRequired = ["/Cuadernos/User","/User"]
