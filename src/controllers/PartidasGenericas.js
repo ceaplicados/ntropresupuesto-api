@@ -1,4 +1,4 @@
-import connection from '../../config/db.conf.js';
+import pool from '../../config/db.conf.js';
 import PartidaGenerica from '../models/PartidaGenerica.js';
 import VersionPresupuesto from '../models/VersionPresupuesto.js';
 
@@ -10,7 +10,10 @@ export default class PartidasGenericas {
         let params = [idPartidaGenerica];
         
         try {
+            const connection = await pool.getConnection();
             const [results] = await connection.query(query, params);
+            pool.releaseConnection(connection);
+
             result = results.map((row) => {
                 let partidaGenerica = new PartidaGenerica();
                 partidaGenerica.Id = row.Id;
@@ -36,7 +39,10 @@ export default class PartidasGenericas {
         let params = [clavePartidaGenerica];
         
         try {
+            const connection = await pool.getConnection();
             const [results] = await connection.query(query, params);
+            pool.releaseConnection(connection);
+
             result = results.map((row) => {
                 let partidaGenerica = new PartidaGenerica();
                 partidaGenerica.Id = row.Id;
@@ -63,7 +69,10 @@ export default class PartidasGenericas {
         let params = [claveConceptoGeneral];
         
         try {
+            const connection = await pool.getConnection();
             const [results] = await connection.query(query, params);
+            pool.releaseConnection(connection);
+
             result = results.map((row) => {
                 let partidaGenerica = new PartidaGenerica();
                 partidaGenerica.Id = row.Id;
@@ -88,7 +97,10 @@ export default class PartidasGenericas {
         let params = [claveCapituloGasto];
         
         try {
+            const connection = await pool.getConnection();
             const [results] = await connection.query(query, params);
+            pool.releaseConnection(connection);
+
             result = results.map((row) => {
                 let partidaGenerica = new PartidaGenerica();
                 partidaGenerica.Id = row.Id;
@@ -119,7 +131,10 @@ export default class PartidasGenericas {
         query+='GROUP BY `PartidasGenericas`.`Id` ORDER BY `PartidasGenericas`.`Clave`;';
         
         try {
+            const connection = await pool.getConnection();
             const [results] = await connection.query(query, params);
+            pool.releaseConnection(connection);
+
             result = results.map((row) => {
                 let partidaGenerica = new PartidaGenerica();
                 delete partidaGenerica.Id;
@@ -147,7 +162,10 @@ export default class PartidasGenericas {
                 +'GROUP BY VersionesPresupuesto.Id';
         let params = [clavePartidaGenerica];
         try {
+            const connection = await pool.getConnection();
             const [results] = await connection.query(query, params);
+            pool.releaseConnection(connection);
+
             result = results.map((row) => {
                 let versionPresupuesto = new VersionPresupuesto();
                     versionPresupuesto.Id  = row.Id;
@@ -183,7 +201,10 @@ export default class PartidasGenericas {
         let params = [idVersion, claveConceptoGeneral];
                 
         try {
+            const connection = await pool.getConnection();
             const [results] = await connection.query(query, params);
+            pool.releaseConnection(connection);
+
             result = results.map((row) => {
                 let partidaGenerica = new PartidaGenerica();
                 delete partidaGenerica.Id;
@@ -213,7 +234,10 @@ export default class PartidasGenericas {
         let params = [idVersion, claveCapituloGasto];
                 
         try {
+            const connection = await pool.getConnection();
             const [results] = await connection.query(query, params);
+            pool.releaseConnection(connection);
+            
             result = results.map((row) => {
                 let partidaGenerica = new PartidaGenerica();
                 delete partidaGenerica.Id;

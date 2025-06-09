@@ -1,4 +1,4 @@
-import connection from '../../config/db.conf.js';
+import pool from '../../config/db.conf.js';
 import ProgramaPresupuestal from '../models/ProgramaPresupuestal.js';
 import VersionPresupuesto from '../models/VersionPresupuesto.js';
 
@@ -6,12 +6,14 @@ export default class ProgramasPresupuestales {
     async getById (idProgramaPresupuestal) {
         let result=new ProgramaPresupuestal();
         try {
+            const connection = await pool.getConnection();
             const [results] = await connection.query(
                 'SELECT Programas.*, CONCAT(UnidadPresupuestal.Clave,"-",UnidadResponsable.Clave,"-",Programas.Clave) AS ClaveCompleta FROM Programas '
                     +' JOIN UnidadResponsable ON UnidadResponsable.Id=Programas.UnidadResponsable'
                     +' JOIN UnidadPresupuestal ON UnidadPresupuestal.Id=UnidadResponsable.UnidadPresupuestal '
                     +' WHERE Programas.Id=?;',
-                [idProgramaPresupuestal])
+                [idProgramaPresupuestal]);
+            pool.releaseConnection(connection);
             
             result=results.map((row) => {
                 let programaPresupuestal=new ProgramaPresupuestal();
@@ -36,12 +38,14 @@ export default class ProgramasPresupuestales {
     async getByClaveEstado (claveProgramaPresupuestal,idEstado) {
         let programa=new ProgramaPresupuestal();
         try {
+            const connection = await pool.getConnection();
             const [results] = await connection.query(
                 'SELECT Programas.*, CONCAT(UnidadPresupuestal.Clave,"-",UnidadResponsable.Clave,"-",Programas.Clave) AS ClaveCompleta FROM Programas '
                     +' JOIN UnidadResponsable ON UnidadResponsable.Id=Programas.UnidadResponsable'
                     +' JOIN UnidadPresupuestal ON UnidadPresupuestal.Id=UnidadResponsable.UnidadPresupuestal '
                     +' WHERE UnidadPresupuestal.Estado=? HAVING ClaveCompleta=?;',
-                [idEstado,claveProgramaPresupuestal])
+                [idEstado,claveProgramaPresupuestal]);
+            pool.releaseConnection(connection);
             
             const result=results.map((row) => {
                 let programaPresupuestal=new ProgramaPresupuestal();
@@ -79,7 +83,10 @@ export default class ProgramasPresupuestales {
                 query += ' LIMIT '+quantity;
             }
 
-            const [results] = await connection.query(query,params)
+            const connection = await pool.getConnection();
+            const [results] = await connection.query(query,params);
+            pool.releaseConnection(connection);
+
             result=results.map((row) => {
                 let programaPresupuestal=new ProgramaPresupuestal();
                 programaPresupuestal.Id=row.Id;
@@ -108,7 +115,10 @@ export default class ProgramasPresupuestales {
                 +'WHERE Version = ? HAVING ClaveCompleta LIKE ? ORDER BY Monto DESC';
             let params = [idVersion,claveUR];
 
-            const [results] = await connection.query(query,params)
+            const connection = await pool.getConnection();
+            const [results] = await connection.query(query,params);
+            pool.releaseConnection(connection);
+
             result=results.map((row) => {
                 let programaPresupuestal=new ProgramaPresupuestal();
                 programaPresupuestal.Id=row.Id;
@@ -139,7 +149,10 @@ export default class ProgramasPresupuestales {
                 +'WHERE Version IN ('+idsVersiones.join(',')+') HAVING ClaveCompleta=?;';
             let params = [claveProgramaPresupuestal];
 
-            const [results] = await connection.query(query,params)
+            const connection = await pool.getConnection();
+            const [results] = await connection.query(query,params);
+            pool.releaseConnection(connection);
+
             result=results.map((row) => {
                 let programaPresupuestal=new ProgramaPresupuestal();
                 programaPresupuestal.Id=row.Id;
@@ -171,7 +184,10 @@ export default class ProgramasPresupuestales {
                 +'WHERE Version IN ('+idsVersiones.join(',')+') HAVING ClaveCompleta=?;';
             let params = [claveProgramaPresupuestal];
 
-            const [results] = await connection.query(query,params)
+            const connection = await pool.getConnection();
+            const [results] = await connection.query(query,params);
+            pool.releaseConnection(connection);
+
             result=results.map((row) => {
                 let versionPresupuesto = new VersionPresupuesto();
                     versionPresupuesto.Id  = row.Id;
@@ -208,7 +224,10 @@ export default class ProgramasPresupuestales {
                 +'WHERE Version = ? HAVING ClaveCompleta LIKE ? OR Buscar LIKE ? ORDER BY ClaveCompleta';
             let params = [idVersion,buscar,buscar];
 
-            const [results] = await connection.query(query,params)
+            const connection = await pool.getConnection();
+            const [results] = await connection.query(query,params);
+            pool.releaseConnection(connection);
+            
             result=results.map((row) => {
                 let programaPresupuestal=new ProgramaPresupuestal();
                 programaPresupuestal.Id=row.Id;

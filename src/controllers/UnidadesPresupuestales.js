@@ -1,4 +1,4 @@
-import connection from '../../config/db.conf.js';
+import pool from '../../config/db.conf.js';
 import UnidadPresupuestal from '../models/UnidadPresupuestal.js';
 import VersionPresupuesto from '../models/VersionPresupuesto.js';
 
@@ -6,10 +6,12 @@ export default class UnidadesPresupuestales {
     async getById (idUnidadPresupuestal) {
         let result=new UnidadPresupuestal();
         try {
+            const connection = await pool.getConnection();
             const [results] = await connection.query(
                 'SELECT * FROM UnidadPresupuestal '
                     +' WHERE UnidadPresupuestal.Id=?;',
-                [idUnidadPresupuestal])
+                [idUnidadPresupuestal]);
+            pool.releaseConnection(connection);
             
                 result=results.map((row) => {
                 let unidadPresupuestal=new UnidadPresupuestal();
@@ -33,10 +35,12 @@ export default class UnidadesPresupuestales {
     async getByClaveEstado (claveUnidadPresupuestal,idEstado) {
         let result=new UnidadPresupuestal();
         try {
+            const connection = await pool.getConnection();
             const [results] = await connection.query(
                 'SELECT * FROM UnidadPresupuestal '
                     +' WHERE  Clave = ? AND Estado=?;',
-                [claveUnidadPresupuestal,idEstado])
+                [claveUnidadPresupuestal,idEstado]);
+            pool.releaseConnection(connection);
             
                 result=results.map((row) => {
                 let unidadPresupuestal=new UnidadPresupuestal();
@@ -60,11 +64,13 @@ export default class UnidadesPresupuestales {
     async getByEstado (idEstado) {
         let result=[];
         try {
+            const connection = await pool.getConnection();
             const [results] = await connection.query(
                 'SELECT * FROM UnidadPresupuestal '
                     +' WHERE UnidadPresupuestal.Estado=?'
                     +' ORDER BY Clave ',
-                [idEstado])
+                [idEstado]);
+            pool.releaseConnection(connection);
             
                 result=results.map((row) => {
                 let unidadPresupuestal=new UnidadPresupuestal();
@@ -97,8 +103,9 @@ export default class UnidadesPresupuestales {
                 params.push(idUnidadPresupuestal);
             }
             query+=" GROUP BY `UnidadPresupuestal`.`Id`;";
-            
-            const [results] = await connection.query(query,params)
+            const connection = await pool.getConnection();
+            const [results] = await connection.query(query,params);
+            pool.releaseConnection(connection);
             
                 result=results.map((row) => {
                 let unidadPresupuestal=new UnidadPresupuestal();
@@ -130,7 +137,9 @@ export default class UnidadesPresupuestales {
             
             let params=[claveUnidadPresupuestal];
             
-            const [results] = await connection.query(query,params)
+            const connection = await pool.getConnection();
+            const [results] = await connection.query(query,params);
+            pool.releaseConnection(connection);
             
                 result=results.map((row) => {
                     let versionPresupuesto = new VersionPresupuesto();
@@ -172,7 +181,9 @@ export default class UnidadesPresupuestales {
             
             let params=[idVersion,claveUnidadPresupuestal,claveCapituloGasto];
             
-            const [results] = await connection.query(query,params)
+            const connection = await pool.getConnection();
+            const [results] = await connection.query(query,params);
+            pool.releaseConnection(connection);
             
                 result=results.map((row) => {
                 let unidadPresupuestal=new UnidadPresupuestal();
@@ -206,7 +217,9 @@ export default class UnidadesPresupuestales {
             
             let params=[idVersion,claveUnidadPresupuestal,claveConceptoGeneral];
             
-            const [results] = await connection.query(query,params)
+            const connection = await pool.getConnection();
+            const [results] = await connection.query(query,params);
+            pool.releaseConnection(connection);
             
                 result=results.map((row) => {
                 let unidadPresupuestal=new UnidadPresupuestal();
@@ -239,7 +252,9 @@ export default class UnidadesPresupuestales {
             
             let params=[idVersion,claveUnidadPresupuestal,clavePartidaGenerica];
             
-            const [results] = await connection.query(query,params)
+            const connection = await pool.getConnection();
+            const [results] = await connection.query(query,params);
+            pool.releaseConnection(connection);
             
                 result=results.map((row) => {
                 let unidadPresupuestal=new UnidadPresupuestal();
@@ -271,7 +286,9 @@ export default class UnidadesPresupuestales {
             
             let params=[idVersion,claveUnidadPresupuestal,claveObjetoGasto];
             
-            const [results] = await connection.query(query,params)
+            const connection = await pool.getConnection();
+            const [results] = await connection.query(query,params);
+            pool.releaseConnection(connection);
             
                 result=results.map((row) => {
                 let unidadPresupuestal=new UnidadPresupuestal();

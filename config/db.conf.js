@@ -3,7 +3,7 @@ dotenv.config({ path: './config/config.env' });
 
 import mysql from 'mysql2/promise';
 
-const connection = await mysql.createPool({
+const pool = mysql.createPool({
     host: process.env.DB_HOST,
     user: process.env.DB_USER,
     password: process.env.DB_PASSWORD,
@@ -11,4 +11,4 @@ const connection = await mysql.createPool({
     port: process.env.DB_PORT
 });
 
-export default connection;
+export default pool;

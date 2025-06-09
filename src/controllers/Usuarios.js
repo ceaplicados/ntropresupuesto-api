@@ -1,4 +1,4 @@
-import connection from '../../config/db.conf.js';
+import pool from '../../config/db.conf.js';
 import Usuario from '../models/Usuario.js';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -9,9 +9,11 @@ export default class Usuarios {
             let query='SELECT * FROM `Usuarios` WHERE `Email` = ?';
             let params=[email];
             
+            const connection = await pool.getConnection();
             const [results] = await connection.query(
                 query,
-                params)
+                params);
+            pool.releaseConnection(connection);
 
             let result=results.map((row) => {
                 let usuario=new Usuario();
@@ -52,9 +54,11 @@ export default class Usuarios {
             let query='SELECT * FROM `Usuarios` WHERE `GoogleId` = ?';
             let params=[googleId];
             
+            const connection = await pool.getConnection();
             const [results] = await connection.query(
                 query,
-                params)
+                params);
+            pool.releaseConnection(connection);
 
             let result=results.map((row) => {
                 let usuario=new Usuario();
@@ -96,9 +100,11 @@ export default class Usuarios {
             let query='SELECT * FROM `Usuarios` WHERE `UUID` = ?';
             let params=[uuid];
             
+            const connection = await pool.getConnection();
             const [results] = await connection.query(
                 query,
-                params)
+                params);
+            pool.releaseConnection(connection);
 
             let result=results.map((row) => {
                 let usuario=new Usuario();
@@ -149,9 +155,11 @@ export default class Usuarios {
                 usuario.Id
             ];
             
+            const connection = await pool.getConnection();
             const [results] = await connection.query(
                 query,
-                params)            
+                params);
+            pool.releaseConnection(connection);            
 
             return usuario;
         } catch (err) {
@@ -178,9 +186,11 @@ export default class Usuarios {
                 usuario.DateBorn
             ];
             
+            const connection = await pool.getConnection();
             const [results] = await connection.query(
                 query,
-                params)            
+                params);
+            pool.releaseConnection(connection);
             
             usuario.Id=results.insertId;
             return usuario;

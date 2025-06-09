@@ -1,4 +1,4 @@
-import connection from '../../config/db.conf.js';
+import pool from '../../config/db.conf.js';
 import VersionPresupuesto from '../models/VersionPresupuesto.js';
 
 export default class VersionesPresupuesto {
@@ -8,9 +8,11 @@ export default class VersionesPresupuesto {
             let query='SELECT * FROM `VersionesPresupuesto` WHERE `Id` = ?';
             let params=[id];
             
+            const connection = await pool.getConnection();
             const [results] = await connection.query(
                 query,
-                params)
+                params);
+            pool.releaseConnection(connection);
 
             let result=results.map((row) => {
                 let versionPresupuesto=new VersionPresupuesto();
@@ -50,7 +52,9 @@ export default class VersionesPresupuesto {
         try {
             let query='SELECT * FROM `VersionesPresupuesto` WHERE `Id` IN ('+ids.join(',')+')';
             
+            const connection = await pool.getConnection();
             const [results] = await connection.query(query)
+            pool.releaseConnection(connection);
 
             let result=results.map((row) => {
                 let versionPresupuesto=new VersionPresupuesto();
@@ -90,7 +94,10 @@ export default class VersionesPresupuesto {
                 query = 'SELECT * FROM `VersionesPresupuesto` WHERE `Estado` = ? AND Anio IN (?) AND Actual=1 ORDER BY Anio ASC,Fecha';
                 params = [idEstado,anios];
             }
-            const [results] = await connection.query(query,params)
+            const connection = await pool.getConnection();
+            const [results] = await connection.query(query,params);
+            pool.releaseConnection(connection);
+
             result=results.map((row) => {
                 let versionPresupuesto=new VersionPresupuesto();
                 versionPresupuesto.Id=row.Id;
@@ -128,9 +135,12 @@ export default class VersionesPresupuesto {
                 query = 'SELECT * FROM `VersionesPresupuesto` WHERE Actual=1 AND `Estado` = ? ORDER BY Anio DESC LIMIT 1';
                 params = [idEstado];
             }
+
+            const connection = await pool.getConnection();
             const [results] = await connection.query(
                 query,
-                params)
+                params);
+            pool.releaseConnection(connection);
 
             let result=results.map((row) => {
                 let versionPresupuesto=new VersionPresupuesto();
@@ -170,9 +180,13 @@ export default class VersionesPresupuesto {
         try {
             let query='SELECT SUM(`Monto`) AS Total FROM `ObjetoDeGasto` WHERE `VersionPresupuesto` =  ?';
             let params=[idVersion];
+
+            const connection = await pool.getConnection();
             const [results] = await connection.query(
                 query,
-                params)
+                params);
+            pool.releaseConnection(connection);
+
             total=results[0].Total;
         } catch (err) {
             console.log(err);
@@ -190,7 +204,11 @@ export default class VersionesPresupuesto {
             +'GROUP BY `VersionesPresupuesto`.`Id` '
             +'ORDER BY Anio ASC,Fecha DESC';
             let params=[idEstado];
-            const [results] = await connection.query(query,params)
+
+            const connection = await pool.getConnection();
+            const [results] = await connection.query(query,params);
+            pool.releaseConnection(connection);
+            
             result=results.map((row) => {
                 let versionPresupuesto=new VersionPresupuesto();
                 versionPresupuesto.Id=row.Id;

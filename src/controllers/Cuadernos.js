@@ -1,4 +1,4 @@
-import connection from '../../config/db.conf.js';
+import pool from '../../config/db.conf.js';
 import Cuaderno from '../models/Cuaderno.js';
 import Usuario from '../models/Usuario.js';
 import RenglonesCuaderno from './RenglonesCuaderno.js';
@@ -28,8 +28,11 @@ export default class Usuarios {
     async getUsers (cuaderno) {
         try{
             let Usuarios=[];
+            const connection = await pool.getConnection();
             const [results] = await connection.query(
-                'SELECT * FROM `Usuarios` WHERE `Id` IN (SELECT `Usuario` FROM `UsuariosCuaderno` WHERE `Cuaderno`=?)',[cuaderno.Id])
+                'SELECT * FROM `Usuarios` WHERE `Id` IN (SELECT `Usuario` FROM `UsuariosCuaderno` WHERE `Cuaderno`=?)',[cuaderno.Id]);
+            pool.releaseConnection(connection);
+
             Usuarios=results.map((row) => {
                 let usuario=new Usuario();
                 delete usuario.Id
@@ -59,9 +62,11 @@ export default class Usuarios {
     async listPublic () {
         let result=[];
         try {
+            const connection = await pool.getConnection();
             const [results] = await connection.query(
-                'SELECT *, Cuadernos.Id AS CuadernosId, Cuadernos.Nombre AS CuadernosNombre, Usuarios.Nombre AS UsuariosNombre FROM Cuadernos JOIN Usuarios ON Cuadernos.Owner=Usuarios.Id WHERE Cuadernos.Publico=1')
-            
+                'SELECT *, Cuadernos.Id AS CuadernosId, Cuadernos.Nombre AS CuadernosNombre, Usuarios.Nombre AS UsuariosNombre FROM Cuadernos JOIN Usuarios ON Cuadernos.Owner=Usuarios.Id WHERE Cuadernos.Publico=1');
+            pool.releaseConnection(connection);
+
                 result=results.map((row) => {
                 
                     let owner=new Usuario();
@@ -111,6 +116,7 @@ export default class Usuarios {
     async getByUser (UUID) {
         let result=[];
         try {
+            const connection = await pool.getConnection();
             const [results] = await connection.query(
                 'SELECT *, Cuadernos.Id AS CuadernosId, Cuadernos.Nombre AS CuadernosNombre, Usuarios.Nombre AS UsuariosNombre '
                     +' FROM (SELECT Cuadernos.* FROM Cuadernos '
@@ -121,7 +127,8 @@ export default class Usuarios {
                     +' JOIN UsuariosCuaderno ON UsuariosCuaderno.Cuaderno=Cuadernos.Id '
                     +' JOIN Usuarios ON Usuarios.Id=UsuariosCuaderno.Usuario'
                     +' WHERE Usuarios.UUID=?) AS Cuadernos'
-                    +' JOIN Usuarios ON Cuadernos.Owner=Usuarios.Id',[UUID,UUID])
+                    +' JOIN Usuarios ON Cuadernos.Owner=Usuarios.Id',[UUID,UUID]);
+            pool.releaseConnection(connection);
             
                 result=results.map((row) => {
                     let cuaderno=new Cuaderno();
@@ -175,8 +182,10 @@ export default class Usuarios {
         let cuaderno=new Cuaderno();
         let result=[];
         try {
+            const connection = await pool.getConnection();
             const [results] = await connection.query(
-                'SELECT *, Cuadernos.Id AS CuadernosId, Cuadernos.Nombre AS CuadernosNombre, Usuarios.Nombre AS UsuariosNombre FROM Cuadernos JOIN Usuarios ON Cuadernos.Owner=Usuarios.Id WHERE Cuadernos.Id=?',[id])
+                'SELECT *, Cuadernos.Id AS CuadernosId, Cuadernos.Nombre AS CuadernosNombre, Usuarios.Nombre AS UsuariosNombre FROM Cuadernos JOIN Usuarios ON Cuadernos.Owner=Usuarios.Id WHERE Cuadernos.Id=?',[id]);
+            pool.releaseConnection(connection);
             
                 result=results.map((row) => {
                     let owner=new Usuario();

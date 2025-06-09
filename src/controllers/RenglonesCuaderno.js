@@ -1,13 +1,17 @@
-import connection from '../../config/db.conf.js';
+import pool from '../../config/db.conf.js';
 import RenglonCuaderno from '../models/RenglonCuaderno.js';
 
 export default class RenglonesCuaderno {
     async getByCuaderno (cuaderno) {
         try {
             let renglones = [];
+
+            const connection = await pool.getConnection();
             const [results] = await connection.query(
                 'SELECT * FROM `RenglonCuaderno` WHERE `Cuaderno`=?', [cuaderno.Id]
             );
+            pool.releaseConnection(connection);
+            
             renglones = results.map((row) => {
                 let renglon = new RenglonCuaderno();
                 renglon.Id = row.Id;

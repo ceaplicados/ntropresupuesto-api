@@ -1,4 +1,4 @@
-import connection from '../../config/db.conf.js';
+import pool from '../../config/db.conf.js';
 import ConceptoGeneral from '../models/ConceptoGeneral.js';
 import VersionPresupuesto from '../models/VersionPresupuesto.js';
 
@@ -9,7 +9,10 @@ export default class ConceptosGenerales {
         query+='WHERE `Id`= ? ;';
         let params = [idConceptoGeneral];
         try {
+            const connection = await pool.getConnection();
             const [results] = await connection.query(query, params);
+            pool.releaseConnection(connection);
+
             result = results.map((row) => {
                 let conceptoGeneral = new ConceptoGeneral();
                 conceptoGeneral.Id = row.Id;
@@ -34,7 +37,10 @@ export default class ConceptosGenerales {
         query+='WHERE `Clave`= ? ;';
         let params = [claveConceptoGeneral];
         try {
+            const connection = await pool.getConnection();
             const [results] = await connection.query(query, params);
+            pool.releaseConnection(connection);
+
             result = results.map((row) => {
                 let conceptoGeneral = new ConceptoGeneral();
                 conceptoGeneral.Id = row.Id;
@@ -60,7 +66,10 @@ export default class ConceptosGenerales {
             +'WHERE CapitulosGasto.Clave= ? ;';
         let params = [claveCapituloGasto];
         try {
+            const connection = await pool.getConnection();
             const [results] = await connection.query(query, params);
+            pool.releaseConnection(connection);
+
             result = results.map((row) => {
                 let conceptoGeneral = new ConceptoGeneral();
                 conceptoGeneral.Id = row.Id;
@@ -92,7 +101,10 @@ export default class ConceptosGenerales {
         query+='GROUP BY `ConceptosGenerales`.`Id` ORDER BY `ConceptosGenerales`.`Clave`;';
         
         try {
+            const connection = await pool.getConnection();
             const [results] = await connection.query(query, params);
+            pool.releaseConnection(connection);
+
             result = results.map((row) => {
                 let conceptoGeneral = new ConceptoGeneral();
                 delete conceptoGeneral.Id;
@@ -121,7 +133,10 @@ export default class ConceptosGenerales {
                 +'GROUP BY VersionesPresupuesto.Id ORDER BY VersionesPresupuesto.Anio, VersionesPresupuesto.Anio;';
         let params = [claveConceptoGeneral];
         try {
+            const connection = await pool.getConnection();
             const [results] = await connection.query(query, params);
+            pool.releaseConnection(connection);
+
             result = results.map((row) => {
                 let versionPresupuesto = new VersionPresupuesto();
                     versionPresupuesto.Id  = row.Id;
@@ -156,7 +171,10 @@ export default class ConceptosGenerales {
         let params = [idVersion,claveCapituloGasto]; 
                        
         try {
+            const connection = await pool.getConnection();
             const [results] = await connection.query(query, params);
+            pool.releaseConnection(connection);
+            
             result = results.map((row) => {
                 let conceptoGeneral = new ConceptoGeneral();
                 delete conceptoGeneral.Id;

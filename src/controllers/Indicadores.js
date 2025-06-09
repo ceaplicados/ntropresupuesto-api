@@ -1,4 +1,4 @@
-import connection from '../../config/db.conf.js';
+import pool from '../../config/db.conf.js';
 import Indicador from '../models/Indicador.js';
 
 export default class Indicadores {
@@ -12,7 +12,10 @@ export default class Indicadores {
                 +'WHERE UnidadPresupuestal.Estado=? HAVING Clave=?';
             let params = [idEstado,clavePrograma];
 
-            const [results] = await connection.query(query,params)
+            const connection = await pool.getConnection();
+            const [results] = await connection.query(query,params);
+            pool.releaseConnection(connection);
+            
             result=results.map((row) => {
                 let indicador=new Indicador();
                 indicador.Id  = row.Id;

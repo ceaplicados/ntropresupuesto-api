@@ -1,4 +1,4 @@
-import connection from '../../config/db.conf.js';
+import pool from '../../config/db.conf.js';
 import ObjetoDeGasto from '../models/ObjetoDeGasto.js';
 import VersionPresupuesto from '../models/VersionPresupuesto.js';
 
@@ -10,7 +10,10 @@ export default class ObjetosDeGasto {
         let params = [idObjetoDeGasto];
         
         try {
+            const connection = await pool.getConnection();
             const [results] = await connection.query(query, params);
+            pool.releaseConnection(connection);
+
             result = results.map((row) => {
                 let objetoDeGasto = new ObjetoDeGasto();
                 objetoDeGasto.Id = row.Id;
@@ -32,7 +35,10 @@ export default class ObjetosDeGasto {
         query+='WHERE `Clave`= ? ORDER BY ObjetoDeGasto.Clave, ObjetoDeGasto.Nombre';
         let params = [claveObjetoDeGasto];
         try {
+            const connection = await pool.getConnection();
             const [results] = await connection.query(query, params);
+            pool.releaseConnection(connection);
+
             const result = results.map((row) => {
                 let objetoDeGasto = new ObjetoDeGasto();
                 delete objetoDeGasto.Id ;
@@ -55,7 +61,10 @@ export default class ObjetosDeGasto {
                 +'WHERE PartidasGenericas.Clave= ? ORDER BY ObjetoDeGasto.Clave, ObjetoDeGasto.Nombre';
         let params = [clavePartidaGenerica];
         try {
+            const connection = await pool.getConnection();
             const [results] = await connection.query(query, params);
+            pool.releaseConnection(connection);
+
             const result = results.map((row) => {
                 let objetoDeGasto = new ObjetoDeGasto();
                 delete objetoDeGasto.Id
@@ -80,7 +89,10 @@ export default class ObjetosDeGasto {
                 +'WHERE ConceptosGenerales.Clave= ? ORDER BY ObjetoDeGasto.Clave, ObjetoDeGasto.Nombre';
         let params = [claveConceptoGeneral];
         try {
+            const connection = await pool.getConnection();
             const [results] = await connection.query(query, params);
+            pool.releaseConnection(connection);
+
             const result = results.map((row) => {
                 let objetoDeGasto = new ObjetoDeGasto();
                 delete objetoDeGasto.Id ;
@@ -105,7 +117,10 @@ export default class ObjetosDeGasto {
                 +'WHERE CapitulosGasto.Clave= ? ORDER BY ObjetoDeGasto.Clave, ObjetoDeGasto.Nombre';
         let params = [claveCapituloGasto];
         try {
+            const connection = await pool.getConnection();
             const [results] = await connection.query(query, params);
+            pool.releaseConnection(connection);
+
             const result = results.map((row) => {
                 let objetoDeGasto = new ObjetoDeGasto();
                 delete objetoDeGasto.Id ;
@@ -135,7 +150,10 @@ export default class ObjetosDeGasto {
         query+=' ORDER BY `ObjetoDeGasto`.`Clave`;';
 
         try {
+            const connection = await pool.getConnection();
             const [results] = await connection.query(query, params);
+            pool.releaseConnection(connection);
+
             result = results.map((row) => {
                 let objetoDeGasto = new ObjetoDeGasto();
                 objetoDeGasto.Id = row.Id;
@@ -159,7 +177,10 @@ export default class ObjetosDeGasto {
                 +'GROUP BY VersionesPresupuesto.Id';
         let params = [claveObjetoGasto,nombreObjetoGasto];
         try {
+            const connection = await pool.getConnection();
             const [results] = await connection.query(query, params);
+            pool.releaseConnection(connection);
+
             result = results.map((row) => {
                 let versionPresupuesto = new VersionPresupuesto();
                     versionPresupuesto.Id  = row.Id;
@@ -194,7 +215,10 @@ export default class ObjetosDeGasto {
         let params = [idVersion, clavePartidaGenerica];
 
         try {
+            const connection = await pool.getConnection();
             const [results] = await connection.query(query, params);
+            pool.releaseConnection(connection);
+
             result = results.map((row) => {
                 let objetoDeGasto = new ObjetoDeGasto();
                 objetoDeGasto.Id = row.Id;
@@ -222,7 +246,10 @@ export default class ObjetosDeGasto {
         let params = [idVersion, claveConceptoGeneral];
                 
         try {
+            const connection = await pool.getConnection();
             const [results] = await connection.query(query, params);
+            pool.releaseConnection(connection);
+
             result = results.map((row) => {
                 let objetoDeGasto = new ObjetoDeGasto();
                 objetoDeGasto.Id = row.Id;
@@ -252,7 +279,10 @@ export default class ObjetosDeGasto {
         let params = [idVersion, claveCapituloGasto];
                 
         try {
+            const connection = await pool.getConnection();
             const [results] = await connection.query(query, params);
+            pool.releaseConnection(connection);
+            
             result = results.map((row) => {
                 let objetoDeGasto = new ObjetoDeGasto();
                 objetoDeGasto.Id = row.Id;

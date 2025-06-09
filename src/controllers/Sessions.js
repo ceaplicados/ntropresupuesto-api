@@ -1,4 +1,4 @@
-import connection from '../../config/db.conf.js';
+import pool from '../../config/db.conf.js';
 import Session from '../models/Session.js';
 
 export default class Sessions {
@@ -11,7 +11,11 @@ export default class Sessions {
                 +' FROM `Sessions` JOIN `Usuarios` ON `Usuarios`.`Id`=`Sessions`.`Usuario` '
                 +' WHERE `UID`=? AND DateDeath>=?';
             const params=[UID,DateDeath]
+
+            const connection = await pool.getConnection();
             const [results] = await connection.query(query, params);
+            pool.releaseConnection(connection);
+
             let result = results.map((row) => {
                 let session = new Session();
                 session.Id  = row.Id;
@@ -48,9 +52,11 @@ export default class Sessions {
                 session.Agent
             ];
             
+            const connection = await pool.getConnection();
             const [results] = await connection.query(
                 query,
-                params)            
+                params);
+            pool.releaseConnection(connection);          
             
                 session.Id=results.insertId;
             return session;
@@ -67,9 +73,11 @@ export default class Sessions {
                 session.Id
             ];
             
+            const connection = await pool.getConnection();
             const [results] = await connection.query(
                 query,
-                params)            
+                params);
+            pool.releaseConnection(connection);            
 
             return session;
         } catch (err) {

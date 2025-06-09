@@ -16,8 +16,6 @@ import estados from './src/services/Estados.js'
 import dotenv from 'dotenv';
 dotenv.config({ path: './config/config.env' });
 
-import connection from './config/db.conf.js';
-
 const app = express();
 app.use(cors({
     origin: whitelist,
@@ -102,13 +100,6 @@ app.get("/INPC",(req,res)=>{
         console.log(error);
     })
     res.end;
-});
-
-app.use(function(req, res, next) {
-  res.on('finish', function() {
-    connection.end();
-  });
-  next();
 });
 
 app.use('/Federal', routerFederal);

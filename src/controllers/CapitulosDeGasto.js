@@ -1,4 +1,4 @@
-import connection from '../../config/db.conf.js';
+import pool from '../../config/db.conf.js';
 import CapituloGasto from '../models/CapituloGasto.js';
 import VersionPresupuesto from '../models/VersionPresupuesto.js';
 
@@ -10,7 +10,10 @@ export default class CapitulosDeGasto {
         let params = [IdCapituloDeGasto];
         
         try {
+            const connection = await pool.getConnection();
             const [results] = await connection.query(query, params);
+            pool.releaseConnection(connection);
+
             result = results.map((row) => {
                 let capituloGasto = new CapituloGasto();
                 capituloGasto.Id=row.Id;
@@ -35,7 +38,10 @@ export default class CapitulosDeGasto {
         let params = [claveCapituloDeGasto];
         
         try {
+            const connection = await pool.getConnection();
             const [results] = await connection.query(query, params);
+            pool.releaseConnection(connection);
+
             result = results.map((row) => {
                 let capituloGasto = new CapituloGasto();
                 capituloGasto.Id=row.Id;
@@ -70,7 +76,10 @@ export default class CapitulosDeGasto {
         query+='GROUP BY `CapitulosGasto`.`Id`;';
         
         try {
+            const connection = await pool.getConnection();
             const [results] = await connection.query(query, params);
+            pool.releaseConnection(connection);
+
             result = results.map((row) => {
                 let capituloGasto = new CapituloGasto();
                 delete capituloGasto.Id;
@@ -98,7 +107,10 @@ export default class CapitulosDeGasto {
                 +'GROUP BY VersionesPresupuesto.Id';
         let params = [claveCapituloDeGasto];
         try {
+            const connection = await pool.getConnection();
             const [results] = await connection.query(query, params);
+            pool.releaseConnection(connection);
+            
             result = results.map((row) => {
                 let versionPresupuesto = new VersionPresupuesto();
                     versionPresupuesto.Id  = row.Id;

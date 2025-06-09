@@ -1,4 +1,4 @@
-import connection from '../../config/db.conf.js';
+import pool from '../../config/db.conf.js';
 import UnidadResponsable from '../models/UnidadResponsable.js';
 import VersionPresupuesto from '../models/VersionPresupuesto.js';
 
@@ -6,11 +6,13 @@ export default class UnidadesResponsables {
     async getById (idUnidadResponsable) {
         let result=new UnidadResponsable();
         try {
+            const connection = await pool.getConnection();
             const [results] = await connection.query(
                 'SELECT UnidadResponsable.*, CONCAT(UnidadPresupuestal.Clave,"-",UnidadResponsable.Clave) AS ClaveCompleta FROM UnidadResponsable '
                     +' JOIN UnidadPresupuestal ON UnidadPresupuestal.Id=UnidadResponsable.UnidadPresupuestal '
                     +' WHERE UnidadResponsable.Id=?;',
-                [idUnidadResponsable])
+                [idUnidadResponsable]);
+            pool.releaseConnection(connection);
             
             result=results.map((row) => {
                 let unidadResponsable=new UnidadResponsable();
@@ -34,12 +36,15 @@ export default class UnidadesResponsables {
     async getByClaveEstado (claveUnidadResponsable,idEstado) {
         let result=new UnidadResponsable();
         try {
+
+            const connection = await pool.getConnection();
             const [results] = await connection.query(
                 'SELECT UnidadResponsable.*, CONCAT(UnidadPresupuestal.Clave,"-",UnidadResponsable.Clave) AS ClaveCompleta FROM UnidadResponsable '
                     +' JOIN UnidadPresupuestal ON UnidadPresupuestal.Id=UnidadResponsable.UnidadPresupuestal '
                     +' WHERE UnidadPresupuestal.Estado=?'
                     +' HAVING ClaveCompleta=?;',
-                [idEstado,claveUnidadResponsable])
+                [idEstado,claveUnidadResponsable]);
+            pool.releaseConnection(connection);
             
             result=results.map((row) => {
                 let unidadResponsable=new UnidadResponsable();
@@ -76,7 +81,9 @@ export default class UnidadesResponsables {
                     +' ORDER BY ClaveCompleta ';
                 params=[idEstado,'%'+q+'%',,'%'+q+'%'];
             }
-            const [results] = await connection.query(query,params)
+            const connection = await pool.getConnection();
+            const [results] = await connection.query(query,params);
+            pool.releaseConnection(connection);
             
                 result=results.map((row) => {
                 let unidadResponsable=new UnidadResponsable();
@@ -111,7 +118,10 @@ export default class UnidadesResponsables {
                 query += ' GROUP BY UnidadResponsable.Id ';
                 query += ' ORDER BY ClaveCompleta '
             
-            const [results] = await connection.query(query,params)
+            const connection = await pool.getConnection();
+            const [results] = await connection.query(query,params);
+            pool.releaseConnection(connection);
+
             result=results.map((row) => {
                 let unidadResponsable=new UnidadResponsable();
                 unidadResponsable.Id=row.Id;
@@ -144,7 +154,10 @@ export default class UnidadesResponsables {
                     +'ORDER BY VersionesPresupuesto.Anio ASC, VersionesPresupuesto.Fecha ASC ';
             let params = [ClaveUnidadResponsable];
 
-            const [results] = await connection.query(query,params)
+            const connection = await pool.getConnection();
+            const [results] = await connection.query(query,params);
+            pool.releaseConnection(connection);
+
             result=results.map((row) => {
                 let versionPresupuesto = new VersionPresupuesto();
                 versionPresupuesto.Id  = row.Id;
@@ -187,7 +200,10 @@ export default class UnidadesResponsables {
                     +'GROUP BY VersionesPresupuesto.Id ';
             let params = [ClaveUnidadResponsable,claveCapituloGasto];
 
-            const [results] = await connection.query(query,params)
+            const connection = await pool.getConnection();
+            const [results] = await connection.query(query,params);
+            pool.releaseConnection(connection);
+
             result=results.map((row) => {
                 let versionPresupuesto = new VersionPresupuesto();
                 versionPresupuesto.Id  = row.Id;
@@ -228,8 +244,11 @@ export default class UnidadesResponsables {
                     +'AND ConceptosGenerales.Clave=? '
                     +'GROUP BY VersionesPresupuesto.Id ';
             let params = [ClaveUnidadResponsable,claveConceptoGeneral];
+            
+            const connection = await pool.getConnection();
+            const [results] = await connection.query(query,params);
+            pool.releaseConnection(connection);
 
-            const [results] = await connection.query(query,params)
             result=results.map((row) => {
                 let versionPresupuesto = new VersionPresupuesto();
                 versionPresupuesto.Id  = row.Id;
@@ -270,7 +289,10 @@ export default class UnidadesResponsables {
                     +'GROUP BY VersionesPresupuesto.Id ';
             let params = [ClaveUnidadResponsable,clavePartidaGenerica];
 
-            const [results] = await connection.query(query,params)
+            const connection = await pool.getConnection();
+            const [results] = await connection.query(query,params);
+            pool.releaseConnection(connection);
+
             result=results.map((row) => {
                 let versionPresupuesto = new VersionPresupuesto();
                 versionPresupuesto.Id  = row.Id;
@@ -310,7 +332,10 @@ export default class UnidadesResponsables {
                     +'GROUP BY VersionesPresupuesto.Id ';
             let params = [ClaveUnidadResponsable,claveObjetoGasto];
 
-            const [results] = await connection.query(query,params)
+            const connection = await pool.getConnection();
+            const [results] = await connection.query(query,params);
+            pool.releaseConnection(connection);
+
             result=results.map((row) => {
                 let versionPresupuesto = new VersionPresupuesto();
                 versionPresupuesto.Id  = row.Id;
