@@ -29,13 +29,6 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(session({secret: process.env.SESSION_SECRET,resave:true,saveUninitialized:true}));
 
-app.use(function(req, res, next) {
-  res.on('finish', function() {
-    connection.end();
-  });
-  next();
-});
-
 const codigosEstados = estados.estados.map((estado) => {return "/"+estado.Codigo});
 const loginRequired = ["/Cuadernos/User","/User"]
 const loginOptional = ['/Cuadernos/:cuadernoId([0-9]+)']
@@ -109,6 +102,13 @@ app.get("/INPC",(req,res)=>{
         console.log(error);
     })
     res.end;
+});
+
+app.use(function(req, res, next) {
+  res.on('finish', function() {
+    connection.end();
+  });
+  next();
 });
 
 app.use('/Federal', routerFederal);
