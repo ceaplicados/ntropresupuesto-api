@@ -8,7 +8,10 @@ router.get("/",(req,res) => {
     versionesPresupuesto.showByEstado(res.locals.estado.Id)
     .then(
         (value) => res.status(200).json(value) ,
-        (error) => res.status(500).json({message: 'Error al consultar la BDD'})
+        (error) => {
+            console.log(error);
+            res.status(500).json({message: 'Error al consultar la BDD'})
+        }
     );
 });
 
@@ -16,7 +19,10 @@ router.get("/Historico",(req,res) => {
     versionesPresupuesto.getHistoricoByEstado(res.locals.estado.Id)
     .then(
         (value) => res.status(200).json(value) ,
-        (error) => res.status(500).json({message: 'Error al consultar la BDD'})
+        (error) => {
+            console.log(error);
+            res.status(500).json({message: 'Error al consultar la BDD'})
+        }
     );
 });
 

@@ -78,7 +78,9 @@ export default class Sessions {
                 query,
                 params);
             pool.releaseConnection(connection);            
-
+            if(results.affectedRows===0){
+                return null;
+            }
             return session;
         } catch (err) {
             console.log(err);

@@ -48,7 +48,6 @@ export default class VersionesPresupuesto {
     }
 
     async showByIds (ids) {
-        let versionPresupuesto=new VersionPresupuesto();
         try {
             let query='SELECT * FROM `VersionesPresupuesto` WHERE `Id` IN ('+ids.join(',')+')';
             

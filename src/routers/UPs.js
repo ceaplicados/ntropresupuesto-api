@@ -10,7 +10,10 @@ router.get("/",(req,res) => {
         (value) => {
             res.status(200).json(value)
         },
-        (error) => res.status(500).json({message: 'Error al consultar la BDD'})
+        (error) => {
+            console.log(error);
+            res.status(500).json({message: 'Error al consultar la BDD'})
+        }
     );
 })
 
@@ -23,7 +26,10 @@ router.get("/Presupuesto",(req,res) => {
                 presupuesto: value
             })
         },
-        (error) => res.status(500).json({message: 'Error al consultar la BDD'})
+        (error) => {
+            console.log(error);
+            res.status(500).json({message: 'Error al consultar la BDD'})
+        }
     )
 })
 
@@ -48,6 +54,7 @@ router.get("/Presupuesto/:ClaveUnidadPresupuestal",(req,res) => {
             })
         }
         catch (error) {
+            console.log(error);
             res.status(500).json({message: 'Error al consultar la BDD'})
         }
         
@@ -72,7 +79,10 @@ router.get("/Presupuesto/:ClaveUnidadPresupuestal/:Filtro",(req,res) => {
                     presupuesto: value
                 })
             },
-            (error) => res.status(500).json({message: 'Error al consultar la BDD'})
+            (error) => {
+                console.log(error);
+                res.status(500).json({message: 'Error al consultar la BDD'})
+            }
         )
     }else if(exConceptoGeneral.test(filtro)){
         unidadesPresupuestales.showMontosByVersionPresupuestoClaveUPConceptoGeneral(res.locals.versionPresupuesto.Id,claveUP,filtro)
@@ -83,7 +93,10 @@ router.get("/Presupuesto/:ClaveUnidadPresupuestal/:Filtro",(req,res) => {
                     presupuesto: value
                 })
             },
-            (error) => res.status(500).json({message: 'Error al consultar la BDD'})
+            (error) => {
+                console.log(error);
+                res.status(500).json({message: 'Error al consultar la BDD'})
+            }
         )
     }else if(exPartidaGenerica.test(filtro)){
         unidadesPresupuestales.showMontosByVersionPresupuestoClaveUPPartidaGenerica(res.locals.versionPresupuesto.Id,claveUP,filtro)
@@ -94,7 +107,10 @@ router.get("/Presupuesto/:ClaveUnidadPresupuestal/:Filtro",(req,res) => {
                     presupuesto: value
                 })
             },
-            (error) => res.status(500).json({message: 'Error al consultar la BDD'})
+            (error) => {
+                console.log(error);
+                res.status(500).json({message: 'Error al consultar la BDD'})
+            }
         )
     }else if(exObjetoGasto.test(filtro)){
         unidadesPresupuestales.showMontosByVersionPresupuestoClaveUPObjetoGasto(res.locals.versionPresupuesto.Id,claveUP,filtro)
@@ -105,7 +121,10 @@ router.get("/Presupuesto/:ClaveUnidadPresupuestal/:Filtro",(req,res) => {
                     presupuesto: value
                 })
             },
-            (error) => res.status(500).json({message: 'Error al consultar la BDD'})
+            (error) => {
+                console.log(error);
+                res.status(500).json({message: 'Error al consultar la BDD'})
+            }
         )
     }else{
         res.status(404).json({message: 'Filtro no válido'})

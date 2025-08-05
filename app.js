@@ -72,8 +72,8 @@ app.get("/Datos",(req,res)=>{
         return res.status(200).send(data);
     })
     .catch((error) => {
-        return res.status(500).json({message: "No se pudo recuperar el listado de datasets"});
         console.log(error);
+        return res.status(500).json({message: "No se pudo recuperar el listado de datasets"});
     })
 });
 
@@ -84,8 +84,8 @@ app.get("/Estados",(req,res)=>{
         return res.status(200).send(data);
     })
     .catch((error) => {
-        return res.status(500).json({message: "No se pudo recuperar el listado de estados"});
         console.log(error);
+        return res.status(500).json({message: "No se pudo recuperar el listado de estados"});
     })
 });
 
@@ -96,8 +96,8 @@ app.get("/INPC",(req,res)=>{
         return res.status(200).send(data);
     })
     .catch((error) => {
-        return res.status(500).json({message: "No se pudo recuperar el INPC"});
         console.log(error);
+        return res.status(500).json({message: "No se pudo recuperar el INPC"});
     })
     res.end;
 });
@@ -108,5 +108,5 @@ app.use('/auth', routerAuth);
 app.use('/User', routerUser);
 app.use('/Cuadernos', routerCuadernos);
 
-const PORT=process.env.APP_PORT;
+const PORT = process.env.APP_PORT;
 app.listen(PORT,()=>console.log("Server is running"));

@@ -35,7 +35,10 @@ router.post("/Google",(req,res) => {
                         buscarUsuarioByEmail(payload)
                     }
                 },
-                (error) => res.status(500).json({message: 'Error al consultar la BDD'})
+                (error) => {
+                    console.log(error);
+                    res.status(500).json({message: 'Error al consultar la BDD'})
+                }
              )
     }
 
@@ -50,7 +53,10 @@ router.post("/Google",(req,res) => {
                         crearUsuario(payload);
                     }
                 },
-                (error) => res.status(500).json({message: 'Error al consultar la BDD'})
+                (error) => {
+                    console.log(error);
+                    res.status(500).json({message: 'Error al consultar la BDD'})
+                }
             )
     }
 
@@ -69,7 +75,10 @@ router.post("/Google",(req,res) => {
                 (usuario) => {
                     iniciarSesion(usuario);
                 },
-                (error)  => res.status(500).json({message: 'Error al consultar la BDD'})
+                (error)  => {
+                    console.log(error);
+                    res.status(500).json({message: 'Error al consultar la BDD'})
+                }
             )
         }else{
             iniciarSesion(usuario);
@@ -90,7 +99,10 @@ router.post("/Google",(req,res) => {
             (usuario) => {
                 iniciarSesion(usuario);
             },
-            (error)  => res.status(500).json({message: 'Error al consultar la BDD'})
+            (error)  => {
+                    console.log(error);
+                    res.status(500).json({message: 'Error al consultar la BDD'})
+                }
         )
     }
 
@@ -120,6 +132,9 @@ router.post("/Google",(req,res) => {
         sessions.create(session)
             .then(
                 (session) => {
+                    if(!session.Id){
+                        return res.status(500).json({message: 'Error al crear la sesión'})
+                    }
                     res.cookie('jwt',refreshToken, {httpOnly: true, sameSite : 'None', secure: true, maxAge: 24 * 60 * 60 * 1000});
 
                     return res.status(200).json({
@@ -128,7 +143,10 @@ router.post("/Google",(req,res) => {
                         token_type: "Bearer"
                     })
                 },
-                (error)  => res.status(500).json({message: 'Error al consultar la BDD'})
+                (error)  => {
+                    console.log(error);
+                    res.status(500).json({message: 'Error al consultar la BDD'})
+                }
             )
 
         
@@ -164,7 +182,10 @@ router.get("/refresh", (req,res) => {
                 res.status(403).json({message: 'Not valid token'})
             }
         },
-        (error)  => res.status(500).json({message: 'Error al consultar la BDD'})
+        (error)  => {
+                    console.log(error);
+                    res.status(500).json({message: 'Error al consultar la BDD'})
+                }
     )
 });
 
@@ -182,17 +203,27 @@ router.get("/logout", (req,res) => {
                 sessions.updateDateDeath(session)
                 .then(
                     (session) => {
+                        if(!session.Id){
+                            return res.status(500).json({message: 'Error al actualizar la sesión'})
+                        }
+                        // Clear the cookie
                         res.clearCookie('jwt', {httpOnly: true, sameSite: 'None', secure: true});
                         res.status(204).json({message: 'Logged out'})
                     },
-                    (error)  => res.status(500).json({message: 'Error al consultar la BDD'})
+                    (error)  => {
+                        console.log(error);
+                        res.status(500).json({message: 'Error al consultar la BDD'})
+                    }
                 );
             }else{
                 res.clearCookie('jwt', {httpOnly: true, sameSite: 'None', secure: true});
                 res.status(204).json({message: 'Not valid token'})
             }
         },
-        (error)  => res.status(500).json({message: 'Error al consultar la BDD'})
+        (error)  => {
+                    console.log(error);
+                    res.status(500).json({message: 'Error al consultar la BDD'})
+                }
     )
 })
 

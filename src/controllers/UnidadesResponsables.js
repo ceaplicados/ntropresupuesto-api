@@ -79,7 +79,7 @@ export default class UnidadesResponsables {
                     +' WHERE UnidadPresupuestal.Estado=?'
                     +' HAVING ClaveCompleta LIKE ? OR Nombre LIKE ?'
                     +' ORDER BY ClaveCompleta ';
-                params=[idEstado,'%'+q+'%',,'%'+q+'%'];
+                params=[idEstado,'%'+q+'%','%'+q+'%'];
             }
             const connection = await pool.getConnection();
             const [results] = await connection.query(query,params);

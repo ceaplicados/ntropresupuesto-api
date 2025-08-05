@@ -13,7 +13,10 @@ router.get("/",(req,res) => {
                     versionPresupuesto: res.locals.versionPresupuesto,
                     programas: value
                 }) ,
-                (error) => res.status(500).json({message: 'Error al consultar la BDD'})
+                (error) => {
+                    console.log(error);
+                    res.status(500).json({message: 'Error al consultar la BDD'})
+                }
             );            
         }else{
             res.status(500).json({message: 'Se omitió el término de búsqueda'});
@@ -28,7 +31,10 @@ router.get("/",(req,res) => {
                 versionPresupuesto: res.locals.versionPresupuesto,
                 programas: value
             }) ,
-            (error) => res.status(500).json({message: 'Error al consultar la BDD'})
+            (error) => {
+                console.log(error);
+                res.status(500).json({message: 'Error al consultar la BDD'})
+            }
         );
     }
 });

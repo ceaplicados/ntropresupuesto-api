@@ -303,9 +303,9 @@ export default class Usuarios {
                             break;
 
                         case "ObjetoGasto":
-                            let resultObjetoGasto = await this.objetosDeGasto.getById(renglon.IdReferencia);
+                            { const resultObjetoGasto = await this.objetosDeGasto.getById(renglon.IdReferencia);
                             referencias[renglon.Tipo][renglon.IdReferencia] = resultObjetoGasto[0];
-                            break;
+                            break; }
 
                         case "ProgramaPresupuestal":
                             referencias[renglon.Tipo][renglon.IdReferencia]= await this.programasPresupuestales.getById(renglon.IdReferencia)

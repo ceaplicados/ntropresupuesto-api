@@ -13,7 +13,10 @@ router.get("/",(req,res) => {
                 presupuesto: value
             })
         },
-        (error) => res.status(500).json({message: 'Error al consultar la BDD'})
+        (error) => {
+            console.log(error);
+            res.status(500).json({message: 'Error al consultar la BDD'})
+        }
     )
 })
 router.get("/:ClaveCapituloGasto",(req,res) => {

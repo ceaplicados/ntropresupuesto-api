@@ -10,8 +10,8 @@ router.get("/Presupuesto",(req,res)=>{
         return res.status(200).send(data);
     })
     .catch((error) => {
-        return res.status(500).json({message: "No se pudo recuperar el listado de datasets"});
         console.log(error);
+        return res.status(500).json({message: "No se pudo recuperar el listado de datasets"});
     })
 });
 
@@ -22,8 +22,8 @@ router.get("/GastoFederalizado",(req,res)=>{
         return res.status(200).send(data);
     })
     .catch((error) => {
-        return res.status(500).json({message: "No se pudo recuperar el listado de datasets"});
         console.log(error);
+        return res.status(500).json({message: "No se pudo recuperar el listado de datasets"});
     })
 });
 

@@ -43,59 +43,57 @@ router.use("/*",(req,res,next)=>{
 // Determinar las versiones de presupuesto a utilizar
 router.use(/^(?!(\/|\/URs|\/UPs)$).*$/,( req, res, next ) => {
     let versionesPresupuesto=new VersionPresupuesto();
-    const getVersionPresupuesto = new Promise((resolve) => {
-        if(req.query.v){
-            const versiones=req.query.v.split(',');
-            versionesPresupuesto_controller.showByIds(versiones)
-            .then(
-                (value) => {
-                    versionesPresupuesto=value;
-                    if(versionesPresupuesto.length>1){
-                        res.locals.versionPresupuesto=versionesPresupuesto;
-                        next();
-                    }
-                    else if(versionesPresupuesto.length==1){
-                        res.locals.versionPresupuesto=versionesPresupuesto[0];
-                        next();
-                    }
-                    else{
-                        res.status(404).json({
-                            message: "Version de presupuesto no encontrada"
-                        })
-                    }
-                }
-            )
-        }else{
-            let anios=[null];
-            if(req.query.a){
-                anios=req.query.a.split(',');
-            }
-            const getVersiones = async (anios) => {
-                let versiones = await Promise.all(
-                    anios.map((anio) => {
-                        return versionesPresupuesto_controller.getActiva(res.locals.estado.Id,anio)
-                        .then( value => value)
-                    })
-                )
-                versiones=versiones.filter((version) => { return version.Id })
-                if(versiones.length==1){
-                    res.locals.versionPresupuesto=versiones[0];
+    if(req.query.v){
+        const versiones=req.query.v.split(',');
+        versionesPresupuesto_controller.showByIds(versiones)
+        .then(
+            (value) => {
+                versionesPresupuesto=value;
+                if(versionesPresupuesto.length>1){
+                    res.locals.versionPresupuesto=versionesPresupuesto;
                     next();
                 }
-                else if(versiones.length>1){
-                    res.locals.versionPresupuesto=versiones;
+                else if(versionesPresupuesto.length==1){
+                    res.locals.versionPresupuesto=versionesPresupuesto[0];
                     next();
                 }
                 else{
                     res.status(404).json({
-                        message: "No existe una version de presupuesto para los años solicitados"
-                    }) 
+                        message: "Version de presupuesto no encontrada"
+                    })
                 }
-            }   
-            getVersiones(anios)
-
+            }
+        )
+    }else{
+        let anios=[null];
+        if(req.query.a){
+            anios=req.query.a.split(',');
         }
-    })
+        const getVersiones = async (anios) => {
+            let versiones = await Promise.all(
+                anios.map((anio) => {
+                    return versionesPresupuesto_controller.getActiva(res.locals.estado.Id,anio)
+                    .then( value => value)
+                })
+            )
+            versiones=versiones.filter((version) => { return version.Id })
+            if(versiones.length==1){
+                res.locals.versionPresupuesto=versiones[0];
+                next();
+            }
+            else if(versiones.length>1){
+                res.locals.versionPresupuesto=versiones;
+                next();
+            }
+            else{
+                res.status(404).json({
+                    message: "No existe una version de presupuesto para los años solicitados"
+                }) 
+            }
+        }   
+        getVersiones(anios)
+
+    }
 });
 
 router.use("/", versionesPresupuesto);

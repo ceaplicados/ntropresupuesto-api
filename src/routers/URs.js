@@ -1,5 +1,4 @@
 import express from 'express';
-import UnidadResponsable from '../models/UnidadResponsable.js';
 import UnidadesResponsables from '../controllers/UnidadesResponsables.js';
 import CapitulosDeGasto from '../controllers/CapitulosDeGasto.js';
 import ConceptosGenerales from '../controllers/ConceptosGenerales.js';
@@ -17,7 +16,6 @@ const programasPresupuestales = new ProgramasPresupuestales();
 
 // Listado de todas las Unidades Responsables
 router.get("/",(req,res) => {
-    let result=new UnidadResponsable();
     let q=null;
     if(req.query.q){
         q=req.query.q;
@@ -28,7 +26,10 @@ router.get("/",(req,res) => {
         (value) => {
             res.status(200).json(value)
         },
-        (error) => res.status(500).json({message: 'Error al consultar la BDD'})
+        (error) => {
+            console.log(error);
+            res.status(500).json({message: 'Error al consultar la BDD'})
+        }
     );
 })
 
@@ -42,7 +43,10 @@ router.get("/Presupuesto",(req,res) => {
                 presupuesto: value
             })
         },
-        (error) => res.status(500).json({message: 'Error al consultar la BDD'})
+        (error) => {
+            console.log(error);
+            res.status(500).json({message: 'Error al consultar la BDD'})
+        }
     )
 })
 
@@ -63,6 +67,7 @@ router.get("/Presupuesto/:ClaveUnidadResponsable",(req,res) => {
             const presupuestos = await unidadesResponsables.showMontosByVersionesPresupuestoClaveUR(idVersiones,claveUR);
             res.status(200).json({unidadResponsable : ur, presupuesto : presupuestos});
         } catch (error) {
+            console.log(error);
             res.status(500).json({message: 'Error al consultar la BDD'});
         }        
     }
@@ -139,6 +144,7 @@ router.get("/Programas/:ClaveUnidadResponsable",(req,res) => {
             const programas = await programasPresupuestales.showMontosByVersionClaveUR(idVersion,claveUR);
             res.status(200).json(programas);
         } catch (error) {
+            console.log(error);
             res.status(500).json({message: 'Error al consultar la BDD'});
         }        
     }

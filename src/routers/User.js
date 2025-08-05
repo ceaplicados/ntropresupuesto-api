@@ -12,7 +12,10 @@ router.get("/",(req,res) => {
             delete usuario.Id;
             res.status(200).json(usuario)
         },
-        (error) => res.status(500).json({message: 'Error al consultar la BDD'})
+        (error) => {
+            console.log(error);
+            res.status(500).json({message: 'Error al consultar la BDD'})
+        }
     );
 })
 
@@ -45,10 +48,16 @@ router.put("/",(req,res) => {
                     delete usuario.Id;
                     res.status(200).json(usuario)
                 },
-                (error) => res.status(500).json({message: 'Error al consultar la BDD'})
+                (error) => {
+                    console.log(error);
+                    res.status(500).json({message: 'Error al consultar la BDD'})
+                }
             );
         },
-        (error) => res.status(500).json({message: 'Error al consultar la BDD'})
+        (error) => {
+            console.log(error);
+            res.status(500).json({message: 'Error al consultar la BDD'})
+        }
     );
 })
 

@@ -30,7 +30,6 @@ export default class ObjetosDeGasto {
     }
 
     async getByClave (claveObjetoDeGasto) {
-        let response=new ObjetoDeGasto();
         let query='SELECT DISTINCT Clave, Nombre, PartidaGenerica FROM `ObjetoDeGasto` '
         query+='WHERE `Clave`= ? ORDER BY ObjetoDeGasto.Clave, ObjetoDeGasto.Nombre';
         let params = [claveObjetoDeGasto];
@@ -55,7 +54,6 @@ export default class ObjetosDeGasto {
     }
 
     async getByClavePartidaGenerica (clavePartidaGenerica) {
-        let response=new ObjetoDeGasto();
         let query='SELECT DISTINCT ObjetoDeGasto.Clave, ObjetoDeGasto.Nombre, ObjetoDeGasto.PartidaGenerica FROM `ObjetoDeGasto` '
                 +'JOIN `PartidasGenericas` ON `PartidasGenericas`.`Id` =  `ObjetoDeGasto`.`PartidaGenerica` '
                 +'WHERE PartidasGenericas.Clave= ? ORDER BY ObjetoDeGasto.Clave, ObjetoDeGasto.Nombre';
@@ -82,7 +80,6 @@ export default class ObjetosDeGasto {
 
 
     async getByClaveConceptoGeneral (claveConceptoGeneral) {
-        let response=new ObjetoDeGasto();
         let query='SELECT DISTINCT ObjetoDeGasto.Clave, ObjetoDeGasto.Nombre, ObjetoDeGasto.PartidaGenerica FROM `ObjetoDeGasto` '
                 +'JOIN `PartidasGenericas` ON `PartidasGenericas`.`Id` =  `ObjetoDeGasto`.`PartidaGenerica` '
                 +'JOIN `ConceptosGenerales` ON `ConceptosGenerales`.`Id` =  `PartidasGenericas`.`ConceptoGeneral` '
@@ -109,7 +106,6 @@ export default class ObjetosDeGasto {
     }
 
     async getByClaveCapituloGasto (claveCapituloGasto) {
-        let response=new ObjetoDeGasto();
         let query='SELECT DISTINCT ObjetoDeGasto.Clave, ObjetoDeGasto.Nombre, ObjetoDeGasto.PartidaGenerica FROM `ObjetoDeGasto` '
                 +'JOIN `PartidasGenericas` ON `PartidasGenericas`.`Id` =  `ObjetoDeGasto`.`PartidaGenerica` '
                 +'JOIN `ConceptosGenerales` ON `ConceptosGenerales`.`Id` =  `PartidasGenericas`.`ConceptoGeneral` '

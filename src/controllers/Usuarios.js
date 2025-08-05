@@ -160,7 +160,9 @@ export default class Usuarios {
                 query,
                 params);
             pool.releaseConnection(connection);            
-
+            if(results.affectedRows===0){
+                return null;
+            }
             return usuario;
         } catch (err) {
             console.log(err);
