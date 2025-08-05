@@ -110,3 +110,4 @@ app.use('/Cuadernos', routerCuadernos);
 
 const PORT = process.env.APP_PORT;
 app.listen(PORT,()=>console.log("Server is running"));
+export default app;
