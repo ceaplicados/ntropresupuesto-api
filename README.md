@@ -6,7 +6,7 @@ API de la app de #NuestroPresupuesto, disponible en **https://api.nuestropresupu
 Catálogo de datos, con sus fuentes, versiones y fechas de actualización. 
 
 ### GET /INPC
-Serie de valores anuales del Índica Nacional de Precios al Consumidor de acuerdo a los valores publicados por el INEGI, utilizado para deflactar (quitar el efecto de la inflación) las series históricas de manera que se puedan comparar correctamente los montos entre distintos años.
+Serie de valores anuales del Índice Nacional de Precios al Consumidor base 2020 de acuerdo a los valores publicados por el INEGI, utilizado para deflactar (quitar el efecto de la inflación) las series históricas de manera que se puedan comparar correctamente los montos entre distintos años.
 
 ### GET /Estados
 Catálogo de Estados con su Nombre y su código de abreviación
@@ -15,7 +15,7 @@ Catálogo de Estados con su Nombre y su código de abreviación
 ### GET /Federal/Presupuesto
 Histórico del presupuesto federal, a valores corrientes. Fuente: [Transparencia Presupuestaria](https://www.transparenciapresupuestaria.gob.mx/).
 
-### GET /Federal/GastoFederalizado
+### GET /Federal/
 Histórico del total del gasto federalizado agrupado en Participaciones, Aportaciones, Convenios y Subsidios. Fuente: [Transparencia Presupuestaria](https://www.transparenciapresupuestaria.gob.mx/).
 
 ## Estados

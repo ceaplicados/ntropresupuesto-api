@@ -49,7 +49,6 @@ router.get("/Presupuesto/:ClaveUnidadPresupuestal",(req,res) => {
             const unidadPresupuestal= await unidadesPresupuestales.getByClaveEstado(claveUP,res.locals.estado.Id);
             res.status(200).json({
                 unidadPresupuestal: unidadPresupuestal,
-                versionPresupuesto: res.locals.versionPresupuesto,
                 presupuestos: presupuestos
             })
         }

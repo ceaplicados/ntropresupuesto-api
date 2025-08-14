@@ -28,6 +28,7 @@
         "supertest": "^7.1.4"
     },
     "scripts": {
-        "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js --detectOpenHandles --forceExit"
+        "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js --detectOpenHandles --forceExit",
+        "validate-api": "lint-openapi --config ./openapi.yaml"
     }
 }

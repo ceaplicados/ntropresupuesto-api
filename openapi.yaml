@@ -1,0 +1,1321 @@
+openapi: 3.0.4
+info:
+  title: "#NuestroPresupuesto - API 1.0"
+  description: |-
+    Esta es la documentación para la API de #NuestroPresupuesto, puedes encontrar más información en [nuestropresupuesto.mx](https://nuestropresupuesto.mx).
+    
+    #NuestroPresupuesto es un proyecto mantenido por el Laboratorio de Tecnología Digital del [Centro de Estudios Aplicados](https://www.centrodeestudiosaplicados.org/).
+    
+    Es importante recalcar que los datos que provee la API son a *valores corrientes*, es decir, los montos no están afectados por la inflación, por lo que es necesario deflactarlos para comprarar los montos entre distintos años.  Los datos necesarios para deflactar están disponibles en el endpoint [/INPC](#/components/schemas/INPC) .
+
+    Ligas útiles:
+    - [API repository](https://github.com/ceaplicados/ntropresupuesto-api)
+    - [App de #NuestroPresupuesto](https://app.nuestropresupuesto.mx)
+  termsOfService: https://nuestropresupuesto.mx/api-terms/
+  contact:
+    email: contacto@centrodeestudiosaplicados.org
+  license:
+    name: GPL 3.0
+    url: https://www.gnu.org/licenses/gpl-3.0.en.html
+  version: 1.0.12
+externalDocs:
+  description: Find out more about Swagger
+  url: https://swagger.io
+servers:
+  - url: https://api.nuestropresupuesto.mx
+security:
+  - ApiKeyAuth: []
+tags:
+  - name: Datos
+    description: Set de datos generales
+  - name: Datos federales
+    description: Acceso a los datos a nivel federal
+  - name: Datos estatales
+    description: Acceso a los datos a nivel estatal
+  - name: Cuadernos
+    description: Cuadernos de trabajo
+paths:
+  /Datos:
+    get:
+      tags:
+        - Datos
+      summary: Datasets disponbiles.
+      description: |-
+        Información sobre los datasets disponibles y sus versiones.
+      operationId: Datos
+      responses:
+        '200':
+          description: Successfull request
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Datos'
+  /INPC:
+    get:
+      tags:
+        - Datos
+      summary: Datos del Índice Nacional de Precios al Consumidor.
+      description: |-
+        Serie de valores anuales del Índice Nacional de Precios al Consumidor (INPC) de acuerdo a los valores publicados por el INEGI (para valores históricos) y/o la Secretaría de Hacienda (para valores futuros).
+        
+        Se utlizan para quitar el efecto de la inflación (deflactar) los datos arrojados por la API, y poder hacer comparables los montos entre distintos años.
+        
+        Para deflactar se debe de utilizar un factor que tenga como numerador el valor del año que se utilizará como referencia, y como denominador el valor del año del dato.
+      operationId: INPC
+      responses:
+        '200':
+          description: Successfull request
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/INPC'
+
+                maxItems: 100  
+  /Estados:
+    get:
+      tags:
+        - Datos
+      summary:
+        Listado de estados de la república mexicana.
+      description: Serie de referencia para los códigos de los estados utilizados en los endpoints de los Datos estatales.
+      operationId: Estados
+      responses:
+        '200':
+          description: Successfull request
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Estado'
+                maxItems: 32 
+  /Federal/Presupuesto:
+    get:
+      tags:
+        - Datos federales
+      summary:
+        Presupuesto anual a nivel federal
+      description:
+        Listado del monto de presupuesto federal anual total en miles de millones de pesos a valores corrientes.
+      operationId: Federal_Presupuesto
+      responses:
+        '200':
+          description: Successfull request
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/MontoAnual'
+                maxItems: 100 
+  /Federal/GastoFederalizado:
+    get:
+      tags:
+        - Datos federales
+      summary:
+        Presupuesto anual del gasto federalizado
+      description:
+        Listado de los montos del gasto federalizado anual total en miles de millones de pesos a valores corrientes.
+      operationId: Federal_GastoFederalizado
+      responses:
+        '200':
+          description: Successfull request
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/GastoFederalizado'  
+                maxItems: 100     
+  /{Estado}:
+    get:
+      tags:
+        - Datos estatales
+      parameters:
+        - $ref: '#/components/parameters/EstadoParam'
+      summary: 
+        Versiones de presupuesto disponibles
+      description:
+        "Listado de las versiones del presupuesto disponibles en la base de datos de #NuestroPresupuesto para el estado indicado en la URL."
+      operationId: Estado
+      responses:
+        '200':
+          description: Successfull request
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/VersionPresupuesto'
+                maxItems: 100 
+        '404':
+          description: No se encontró el código del estado proveído en la URL
+  /{Estado}/Historico:
+    get:
+      tags:
+        - Datos estatales
+      parameters:
+        - $ref: '#/components/parameters/EstadoParam'
+      summary: Versiones de presupuesto con montos
+      description:
+        "Listado de las versiones del presupuesto disponibles en la base de datos de #NuestroPresupuesto con su monto correspondiente a pesos corrientes para el estado indicado en la URL."
+      operationId: Estado_Historico
+      responses:
+        '200':
+          description: Successfull request
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/VersionPresupuesto'
+                maxItems: 100 
+        '404':
+          description: No se encontró el código del estado proveído en la URL
+  /{Estado}/UPs:
+    get:
+      tags:
+        - Datos estatales
+      parameters:
+        - $ref: '#/components/parameters/EstadoParam'
+      summary: Unidades Presupuestales
+      description: Listado de las Unidades Presupuestales del estado proveído en la URL
+      operationId: Estado_UPs
+      responses:
+        '200':
+          description: Sucessfull request
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UnidadPresupuestal'
+                maxItems: 100 
+        '404':
+          description: No se encontró el código del estado proveído en la URL
+  /{Estado}/UPs/Presupuesto:
+    get:
+      tags:
+        - Datos estatales
+      parameters:
+        - $ref: '#/components/parameters/EstadoParam'
+        - $ref: '#/components/parameters/vParam'
+        - $ref: '#/components/parameters/aParam'
+      summary: Presupuesto de Unidades Presupuestales
+      description: Monto del presupuesto a valores corrientes asignado a las Unidades Presupuestales del estado proveído en la URL para el año o versión especificados en las variables (a) para la versión actual de un año específico o (v) para una versión específica.  En caso de no especificar año o versión devolverá la última versión actual del presupuesto.
+      operationId: Estado_UPs_Presupuesto
+      responses:
+        '200':
+          description: Sucessfull request
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                properties:
+                  versionPresupuesto:
+                    $ref: '#/components/schemas/VersionPresupuesto'
+                  presupuesto:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/UnidadPresupuestal'
+                    maxItems: 100 
+        '404':
+          description: No se encontró el código del estado proveído en la URL
+  /{Estado}/UPs/Presupuesto/{ClaveUP}:
+    get:
+      tags:
+        - Datos estatales
+      parameters:
+        - $ref: '#/components/parameters/EstadoParam'
+        - $ref: '#/components/parameters/ClaveUpParam'
+        - $ref: '#/components/parameters/vvParam'
+        - $ref: '#/components/parameters/aaParam'
+      summary: Presupuestos para una Unidad Presupuestal
+      description: Montos del presupuesto a valores corrientes asignado a la Unidad Presupuestal especificada en la URL para los años o versiones especificados en las variables (a) para las versiones actuales de los años especificados o (v) para versiones específicas.  En caso de no especificar años o versiones devolverá la última versión actual del presupuesto.
+      operationId: Estado_UPs_Presupuesto_ClaveUP
+      responses:
+        '200':
+          description: Sucessfull request
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                properties:
+                  unidadPresupuestal:
+                    $ref: '#/components/schemas/UnidadPresupuestal'
+                  presupuestos:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/VersionPresupuesto'
+                    maxItems: 100 
+        '404':
+          description: No se encontró el código del estado proveído en la URL
+  /{Estado}/UPs/Presupuesto/{ClaveUP}/{FiltroOG}:
+    get:
+      tags:
+        - Datos estatales
+      parameters:
+        - $ref: '#/components/parameters/EstadoParam'
+        - $ref: '#/components/parameters/ClaveUpParam'
+        - $ref: '#/components/parameters/FiltroOgParam'
+        - $ref: '#/components/parameters/vvParam'
+        - $ref: '#/components/parameters/aaParam'
+      summary: Presupuestos filtrados para una Unidad Presupuestal
+      description: Montos del presupuesto a valores corrientes asignado a la Unidad Presupuestal especificada en la URL filtrados sólo para el Capítulo de Gasto, Concepto General, Partida Genérica u Objeto de Gasto especificados en la URL para los años o versiones especificados en las variables (a) para las versiones actuales de los años especificados o (v) para versiones específicas.  En caso de no especificar años o versiones devolverá la última versión actual del presupuesto.
+      operationId: Estado_UPs_Presupuesto_ClaveUP_FiltroOG
+      responses:
+        '200':
+          description: Sucessfull request
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                properties:
+                  unidadPresupuestal:
+                    $ref: '#/components/schemas/UnidadPresupuestal'
+                  presupuestos:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/VersionPresupuesto'
+                    maxItems: 200 
+        '404':
+          description: No se encontró el código del estado proveído en la URL
+  /{Estado}/URs:
+    get:
+      tags:
+        - Datos estatales
+      parameters:
+        - $ref: '#/components/parameters/EstadoParam'
+      summary: Unidades Responsables
+      description: Listado de las Unidades Responsables del estado proveído en la URL
+      operationId: Estado_URs
+      responses:
+        '200':
+          description: Sucessfull request
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UnidadResponsable'
+                maxItems: 200 
+        '404':
+          description: No se encontró el código del estado proveído en la URL
+  /{Estado}/URs/Presupuesto:
+    get:
+      tags:
+        - Datos estatales
+      parameters:
+        - $ref: '#/components/parameters/EstadoParam'
+        - $ref: '#/components/parameters/vParam'
+        - $ref: '#/components/parameters/aParam'
+      summary: Presupuesto de Unidades Responsables
+      description: Monto del presupuesto a valores corrientes asignado a las Unidades Responsables del estado proveído en la URL para el año o versión especificados en las variables (a) para la versión actual de un año específico o (v) para una versión específica.  En caso de no especificar año o versión devolverá la última versión actual del presupuesto.
+      operationId: Estado_URs_Presupuesto
+      responses:
+        '200':
+          description: Sucessfull request
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                properties:
+                  versionPresupuesto:
+                    $ref: '#/components/schemas/VersionPresupuesto'
+                  presupuesto:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/UnidadResponsable'
+                    maxItems: 200
+        '404':
+          description: No se encontró el código del estado proveído en la URL
+  /{Estado}/URs/Presupuesto/{ClaveUR}:
+    get:
+      tags:
+        - Datos estatales
+      parameters:
+        - $ref: '#/components/parameters/EstadoParam'
+        - $ref: '#/components/parameters/ClaveUrParam'
+        - $ref: '#/components/parameters/vvParam'
+        - $ref: '#/components/parameters/aaParam'
+      summary: Presupuestos para una Unidad Responsable
+      description: Montos del presupuesto a valores corrientes asignado a la Unidad Responsable especificada en la URL para los años o versiones especificados en las variables (a) para las versiones actuales de los años especificados o (v) para versiones específicas.  En caso de no especificar años o versiones devolverá la última versión actual del presupuesto.
+      operationId: Estado_URs_Presupuesto_ClaveUR
+      responses:
+        '200':
+          description: Sucessfull request
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                properties:
+                  unidadResponsable:
+                    $ref: '#/components/schemas/UnidadResponsable'
+                  presupuestos:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/VersionPresupuesto'
+                    maxItems: 200
+        '404':
+          description: No se encontró el código del estado proveído en la URL
+  /{Estado}/URs/Presupuesto/{ClaveUR}/{FiltroOG}:
+    get:
+      tags:
+        - Datos estatales
+      parameters:
+        - $ref: '#/components/parameters/EstadoParam'
+        - $ref: '#/components/parameters/ClaveUrParam'
+        - $ref: '#/components/parameters/FiltroOgParam'
+        - $ref: '#/components/parameters/vvParam'
+        - $ref: '#/components/parameters/aaParam'
+      summary: Presupuestos filtrados para una Unidad Responsable
+      description: Montos del presupuesto a valores corrientes asignado a la Unidad Responsable especificada en la URL filtrados sólo para el Capítulo de Gasto, Concepto General, Partida Genérica u Objeto de Gasto especificados en la URL para los años o versiones especificados en las variables (a) para las versiones actuales de los años especificados o (v) para versiones específicas.  En caso de no especificar años o versiones devolverá la última versión actual del presupuesto.
+      operationId: Estado_URs_Presupuesto_ClaveUR_FiltroOG
+      responses:
+        '200':
+          description: Sucessfull request
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                properties:
+                  unidadResponsable:
+                    $ref: '#/components/schemas/UnidadResponsable'
+                  filtro:
+                    type: object
+                    oneOf:
+                      - $ref: '#/components/schemas/CapituloGasto'
+                      - $ref: '#/components/schemas/ConceptoGeneral'
+                      - $ref: '#/components/schemas/PartidaGenerica'
+                      - $ref: '#/components/schemas/ObjetoGasto'
+                  presupuestos:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/VersionPresupuesto'
+                    maxItems: 200
+        '404':
+          description: No se encontró el código del estado proveído en la URL
+  /{Estado}/CapituloGasto:
+    get:
+      tags:
+        - Datos estatales
+      parameters:
+        - $ref: '#/components/parameters/EstadoParam'
+        - $ref: '#/components/parameters/vParam'
+        - $ref: '#/components/parameters/aParam'
+      summary: Presupuesto por Capítulos de Gasto
+      description: Montos del presupuesto a valores corrientes asignado a cada Capítulo de Gasto para el año o versión especificado en las variables (a) para la versión actual del año especificado o (v) para una versión específica.  En caso de no especificar año o versión devolverá la última versión actual del presupuesto.
+      operationId: Estado_CapituloGasto
+      responses:
+        '200':
+          description: Sucessfull request
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                properties:
+                  versionPresupuesto:
+                    $ref: '#/components/schemas/VersionPresupuesto'
+                  presupuesto:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/CapituloGasto'                      
+                      maxItems: 10
+        '404':
+          description: No se encontró el código del estado proveído en la URL
+  /{Estado}/CapituloGasto/{ClaveCapituloGasto}:
+    get:
+      tags:
+        - Datos estatales
+      parameters:
+        - $ref: '#/components/parameters/EstadoParam'
+        - $ref: '#/components/parameters/ClaveCapituloGastoParam'
+        - $ref: '#/components/parameters/vParam'
+        - $ref: '#/components/parameters/aParam'
+      summary: Presupuesto por Capítulos de Gasto
+      description: Montos del presupuesto a valores corrientes asignado al Capítulo de Gasto especificado para los años o versiones especificados en las variables (a) para las versiones actuales de los años especificados o (v) para versiones específicas.  En caso de no especificar año o versión devolverá la última versión actual del presupuesto.
+      operationId: Estado_CapituloGasto_ClaveCapituloGasto
+      responses:
+        '200':
+          description: Sucessfull request
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                properties:
+                  versionPresupuesto:
+                    $ref: '#/components/schemas/CapituloGasto'
+                  presupuestos:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/VersionPresupuesto'                      
+                      maxItems: 10
+        '404':
+          description: No se encontró el código del estado proveído en la URL
+  /{Estado}/ConceptosGenerales:
+    get:
+      tags:
+        - Datos estatales
+      parameters:
+        - $ref: '#/components/parameters/EstadoParam'
+        - $ref: '#/components/parameters/vParam'
+        - $ref: '#/components/parameters/aParam'
+      summary: Presupuesto por Conceptos Generales
+      description: Montos del presupuesto a valores corrientes asignado a cada Concepto General para el año o versión especificado en las variables (a) para la versión actual del año especificado o (v) para una versión específica.  En caso de no especificar año o versión devolverá la última versión actual del presupuesto.
+      operationId: Estado_ConceptoGeneral
+      responses:
+        '200':
+          description: Sucessfull request
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                properties:
+                  versionPresupuesto:
+                    $ref: '#/components/schemas/VersionPresupuesto'
+                  presupuesto:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ConceptoGeneral'                      
+                      maxItems: 100
+        '404':
+          description: No se encontró el código del estado proveído en la URL
+  /{Estado}/ConceptosGenerales/{ClaveConceptoGeneral}:
+    get:
+      tags:
+        - Datos estatales
+      parameters:
+        - $ref: '#/components/parameters/EstadoParam'
+        - $ref: '#/components/parameters/ClaveConceptoGeneralParam'
+        - $ref: '#/components/parameters/vParam'
+        - $ref: '#/components/parameters/aParam'
+      summary: Presupuesto por Conceptos Generales
+      description: Montos del presupuesto a valores corrientes asignado a los Conceptos Generales especificados para los años o versiones especificados en las variables (a) para las versiones actuales de los años especificados o (v) para versiones específicas.  En caso de no especificar año o versión devolverá la última versión actual del presupuesto.
+      operationId: Estado_ConceptoGeneral_ClaveConceptoGeneral
+      responses:
+        '200':
+          description: Sucessfull request
+          content:
+            application/json:
+              schema:
+                type: array
+                maxItems: 500
+                items:
+                  type: object
+                  additionalProperties: false
+                  properties:
+                    conceptoGeneral:
+                      $ref: '#/components/schemas/ConceptoGeneral'
+                    presupuestos:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/VersionPresupuesto'                      
+                        maxItems: 10
+        '404':
+          description: No se encontró el código del estado proveído en la URL
+  /{Estado}/PartidasGenericas:
+    get:
+      tags:
+        - Datos estatales
+      parameters:
+        - $ref: '#/components/parameters/EstadoParam'
+        - $ref: '#/components/parameters/vParam'
+        - $ref: '#/components/parameters/aParam'
+      summary: Presupuesto por Partidas Genéricas
+      description: Montos del presupuesto a valores corrientes asignado a cada Partida Genérica para el año o versión especificado en las variables (a) para la versión actual del año especificado o (v) para una versión específica.  En caso de no especificar año o versión devolverá la última versión actual del presupuesto.
+      operationId: Estado_PartidasGenericas
+      responses:
+        '200':
+          description: Sucessfull request
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                properties:
+                  versionPresupuesto:
+                    $ref: '#/components/schemas/VersionPresupuesto'
+                  presupuesto:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/PartidaGenerica'                      
+                      maxItems: 100
+        '404':
+          description: No se encontró el código del estado proveído en la URL
+  /{Estado}/PartidasGenericas/{ClavePartidaGenerica}:
+    get:
+      tags:
+        - Datos estatales
+      parameters:
+        - $ref: '#/components/parameters/EstadoParam'
+        - $ref: '#/components/parameters/ClavePartidaGenericaParam'
+        - $ref: '#/components/parameters/vParam'
+        - $ref: '#/components/parameters/aParam'
+      summary: Presupuesto por Partidas Genéricas
+      description: Montos del presupuesto a valores corrientes asignado a ls Partidas Genéricas especificadas para los años o versiones especificados en las variables (a) para las versiones actuales de los años especificados o (v) para versiones específicas.  En caso de no especificar año o versión devolverá la última versión actual del presupuesto.
+      operationId: Estado_PartidasGenericas_ClavePartidaGenerica
+      responses:
+        '200':
+          description: Sucessfull request
+          content:
+            application/json:
+              schema:
+                type: array
+                maxItems: 500
+                items:
+                  type: object
+                  additionalProperties: false
+                  properties:
+                    partidaGenerica:
+                      $ref: '#/components/schemas/PartidaGenerica'
+                    presupuestos:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/VersionPresupuesto'                      
+                        maxItems: 100
+        '404':
+          description: No se encontró el código del estado proveído en la URL
+  /{Estado}/ObjetoDeGasto:
+    get:
+      tags:
+        - Datos estatales
+      parameters:
+        - $ref: '#/components/parameters/EstadoParam'
+        - $ref: '#/components/parameters/vParam'
+        - $ref: '#/components/parameters/aParam'
+      summary: Presupuesto por Objeto de Gasto
+      description: Montos del presupuesto a valores corrientes asignado a cada Objeto de Gasto para el año o versión especificado en las variables (a) para la versión actual del año especificado o (v) para una versión específica.  En caso de no especificar año o versión devolverá la última versión actual del presupuesto.
+      operationId: Estado_ObjetoDeGasto
+      responses:
+        '200':
+          description: Sucessfull request
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                properties:
+                  versionPresupuesto:
+                    $ref: '#/components/schemas/VersionPresupuesto'
+                  presupuesto:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ObjetoGasto'                      
+                      maxItems: 5000
+        '404':
+          description: No se encontró el código del estado proveído en la URL
+  /{Estado}/ObjetoDeGasto/{FiltroOg}:
+    get:
+      tags:
+        - Datos estatales
+      parameters:
+        - $ref: '#/components/parameters/EstadoParam'
+        - $ref: '#/components/parameters/FiltroOgParam'
+        - $ref: '#/components/parameters/vParam'
+        - $ref: '#/components/parameters/aParam'
+      summary: Presupuesto por Objeto de Gasto
+      description: Montos del presupuesto a valores corrientes asignado a los Objetos de Gasto especificados para los años o versiones especificados en las variables (a) para las versiones actuales de los años especificados o (v) para versiones específicas.  En caso de no especificar año o versión devolverá la última versión actual del presupuesto.
+      operationId: Estado_ObjetoDeGasto_FiltroOg
+      responses:
+        '200':
+          description: Sucessfull request
+          content:
+            application/json:
+              schema:
+                type: array
+                maxItems: 5000
+                items:
+                  type: object
+                  additionalProperties: false
+                  properties:
+                    objetoDeGasto:
+                      $ref: '#/components/schemas/ObjetoGasto'
+                    presupuestos:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/VersionPresupuesto'                      
+                        maxItems: 100
+        '404':
+          description: No se encontró el código del estado proveído en la URL
+  /{Estado}/Programas:
+    get:
+      tags:
+        - Datos estatales
+      parameters:
+        - $ref: '#/components/parameters/EstadoParam'
+        - $ref: '#/components/parameters/vParam'
+        - $ref: '#/components/parameters/aParam'
+      summary: Presupuesto por Programa Presupuestal
+      description: Montos del presupuesto a valores corrientes asignado a cada Programa Presupuestal para el año o versión especificado en las variables (a) para la versión actual del año especificado o (v) para una versión específica.  En caso de no especificar año o versión devolverá la última versión actual del presupuesto.
+      operationId: Estado_Programas
+      responses:
+        '200':
+          description: Sucessfull request
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                properties:
+                  versionPresupuesto:
+                    $ref: '#/components/schemas/VersionPresupuesto'
+                  programas:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ProgramaPresupuestal'                      
+                      maxItems: 2000
+        '404':
+          description: No se encontró el código del estado proveído en la URL
+  /{Estado}/Programas/{ClavePrograma}:
+    get:
+      tags:
+        - Datos estatales
+      parameters:
+        - $ref: '#/components/parameters/EstadoParam'
+        - $ref: '#/components/parameters/ClaveProgramaParam'
+        - $ref: '#/components/parameters/vParam'
+        - $ref: '#/components/parameters/aParam'
+      summary: Presupuesto por Programa Presupuestal
+      description: Montos del presupuesto a valores corrientes asignado al Programa Presupuestal especificado para los años o versiones especificados en las variables (a) para las versiones actuales de los años especificados o (v) para versiones específicas.  En caso de no especificar año o versión devolverá la última versión actual del presupuesto.
+      operationId: Estado_Programas_ClavePrograma
+      responses:
+        '200':
+          description: Sucessfull request
+          content:
+            application/json:
+              schema:                
+                type: object
+                additionalProperties: false
+                properties:
+                  programa:
+                    $ref: '#/components/schemas/ProgramaPresupuestal'
+                  presupuestos:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/VersionPresupuesto'                      
+                      maxItems: 100
+        '404':
+          description: No se encontró el código del estado proveído en la URL
+  /{Estado}/Indicadores/{ClavePrograma}:
+    get:
+      tags:
+        - Datos estatales
+      parameters:
+        - $ref: '#/components/parameters/EstadoParam'
+        - $ref: '#/components/parameters/ClaveProgramaParam'
+      summary: Indicadores del Programa Presupuestal
+      description: Indicadores del Programa Presupuestal especificado.
+      operationId: Estado_Indicadores
+      responses:
+        '200':
+          description: Sucessfull request
+          content:
+            application/json:
+              schema:                
+                type: array
+                maxItems: 1000
+                items:
+                  $ref: '#/components/schemas/Indicador'
+        '404':
+          description: No se encontró el código del estado proveído en la URL
+components:
+  parameters:
+    EstadoParam:
+      name: Estado
+      in: path
+      description: Código de abreviatura del estado a consultar
+      required: true
+      example: JAL
+      schema:
+        type: string
+        pattern: '^[A-Z]{2,6}$'
+        maxLength: 6
+    ClaveUpParam:  
+      name: ClaveUP
+      in: path
+      description: Clave de la Unidad Presupuestal a consultar
+      required: true
+      example: '001'
+      schema:
+        type: string
+        pattern: '^[0-9A-Z]{3,4}$'
+        maxLength: 4
+    ClaveUrParam:  
+      name: ClaveUR
+      in: path
+      description: Clave de la Unidad Responsable a consultar
+      required: true
+      example: '001-000'
+      schema:
+        type: string
+        pattern: '^[0-9A-Z-]{6,8}$'
+        maxLength: 8
+    FiltroOgParam:
+      name: FiltroOG
+      in: path
+      description: Filtro para especificar una clave de Capítulo de Gasto, Concepto General, Partida Genérica u Objeto de Gasto
+      required: true
+      example: '1000'
+      schema:
+        type: string
+        pattern: '^[1-9][0-9]{3}$'
+        maxLength: 4
+    ClaveCapituloGastoParam:
+      name: ClaveCapituloGasto
+      in: path
+      description: Filtro para especificar una clave de Capítulo de Gasto
+      required: true
+      example: '1000'
+      schema:
+        type: string
+        pattern: '^[1-9]000$'
+        maxLength: 4
+    ClaveConceptoGeneralParam:
+      name: ClaveConceptoGeneral
+      in: path
+      description: Filtro para especificar una clave de Concepto General o una clave de Capítulo de Gasto
+      required: true
+      example: '1100'
+      schema:
+        type: string
+        pattern: '^[1-9][0-9]00$'
+        maxLength: 4
+    ClavePartidaGenericaParam:
+      name: ClaveConceptoGeneral
+      in: path
+      description: Filtro para especificar una clave de Partida Genérica, de Concepto General, o de Capítulo de Gasto
+      required: true
+      example: '1110'
+      schema:
+        type: string
+        pattern: '^[1-9][0-9][0-9]0$'
+        maxLength: 4
+    ClaveProgramaParam:
+      name: ClavePrograma
+      in: path
+      description: Filtro para especificar una clave de un Programa Presupuestal
+      required: true
+      example: '004-000-112'
+      schema:
+        type: string
+        pattern: '^[0-9A-Z-]{9,14}$'
+        maxLength: 4
+    aParam:
+      name: a
+      in: query
+      description: Año a cuatro dígitos del que se quiere recuperar el presupuesto. Si se especifica el parámetro v se ignorará este parámetro.
+      required: false
+      example: '2019'
+      schema:
+        pattern: '^20[1-2][0-9]$'
+        maxLength: 4
+        type: string
+    vParam:
+      name: v
+      in: query
+      description: Id de la versión de presupuesto que se quiere recuperar
+      required: false
+      example: '1'
+      schema:
+        type: string
+        pattern: '^[0-9]{1,3}$'
+        maxLength: 3
+    aaParam:
+      name: a
+      in: query
+      description: Listado de años a cuatro dígitos separados por comas de los cuales se quiere recuperar el presupuesto. Si se especifica el parámetro v se ignorará este parámetro.
+      required: false
+      example: '2019,2020,2021'
+      schema:
+        type: string
+        pattern: '^20[1-2][0-9](,20[1-2][0-9])*$'
+        maxLength: 100
+    vvParam:
+      name: v
+      in: query
+      description: Ids de la versiones de presupuesto separadas por comas de las cuales se quiere recuperar su monto asignado
+      required: false
+      example: '1,2,3'
+      schema:
+        type: string
+        pattern: '^[0-9]{1,3}(,[0-9]{1,3})*$'
+        maxLength: 100
+  schemas:
+    Datos:
+      type: object
+      description: Información sobre los datasets disponibles y sus versiones.
+      additionalProperties: false
+      properties:
+        dataset:
+          type: string
+          example: /INPC
+        descripcion:
+          type: string
+          example: "Valores anuales del INPC"
+        version:
+          type: number
+          format: float
+          example: 1.0
+        lastUpdate:
+          type: string
+          format: date
+          example: "2025-01-01"
+        versiones:
+          type: array
+          items: 
+            type: object
+            additionalProperties: false
+            properties:
+              version:
+                type: number
+                format: float
+                example: 1.0
+              fecha:
+                type: string
+                format: date
+                example: "2024-01-01"
+              description:
+                type: string
+                example: "Se añade la previsión del INPC para el 2025 publicado en el paquete económico."
+        fuentes:
+          type: string
+          example: "INEGI, y Paquete Económico 2025"
+      required:
+        - dataset
+        - descripcion
+        - version
+        - lastUpdate
+    INPC:
+      type: object
+      description: Valores anuales del Índice Nacional de Precios al Consumidor (INPC).
+      additionalProperties: false
+      properties:
+        year:
+          type: integer
+          description: Año a cuatro dígitos
+          example: 2019
+        value:
+          type: number
+          format: float
+          description: Valor de referencia del INPC
+          example: 95.43074031
+      required:
+        - year
+        - value
+    Estado:
+      type: object
+      description: Información de los estados de la república mexicana.
+      additionalProperties: false
+      properties:
+        Id:
+          type: integer
+          description: Código numérico de acuerdo al SAT
+          example: 1
+        Nombre:
+          type: string
+          description: Nombre común del estado
+          example: Aguascalientes
+        Codigo:
+          type: string
+          description: Abreviatura del estado de acuerdo al estándar ISO 3166-2:MX
+          example: AGS
+      required:
+        - Id
+        - Nombre
+        - Codigo
+    MontoAnual:
+      type: object
+      description: Monto del presupuesto anual total a valores corrientes.
+      additionalProperties: false
+      properties:
+        year:
+          type: integer
+          description: Año a cuatro dígitos
+          example: 2019
+        value:
+          type: number
+          format: float
+          description: Monto del presupuesto total para el año de referencia
+          example: 5838059.7
+      required:
+        - year
+        - value
+    GastoFederalizado:
+      type: object
+      description: Montos del gasto federalizado anual total a valores corrientes.
+      additionalProperties: false
+      properties:
+        year:
+          type: integer
+          description: Año a cuatro dígitos
+          example: 2019
+        Participaciones:
+          type: number
+          format: float
+          description: Monto del presupuesto total de participaciones para el año de referencia
+          example: 919817.3
+        Aportaciones:
+          type: number
+          format: float
+          description: Monto del presupuesto total de aportaciones para el año de referencia
+          example: 789826.7
+        Convenios:
+          type: number
+          format: float
+          description: Monto del presupuesto total de convenios para el año de referencia
+          example: 119649
+        Subsidios:
+          type: number
+          format: float
+          description: Monto del presupuesto total de subsidios para el año de referencia
+          example: 13409.2
+      required:
+        - year
+        - Participaciones
+        - Aportaciones
+        - Convenios
+    VersionPresupuesto:
+      type: object
+      additionalProperties: false
+      description: "Información de las versiones del presupuesto disponibles en la base de datos de #NuestroPresupuesto"
+      properties:
+        Id:
+          type: integer
+          description: "Id de la versión del presupuesto en la base de datos de #NuestroPresupuesto"
+          example: 6
+        Estado:
+          type: integer
+          description: Id numérico del estado al que pertenece la versión del presupuesto
+          example: 14
+        Anio:
+          type: integer
+          description: Año a cuatro dígitos del periodo al que pertenece la versión del presupuesto
+          example: 2018
+        Tipo:
+          type: string
+          description: Tipo de versión del presupuesto
+          example: "Autorizado"
+          enum:
+            - Proyecto
+            - Autorizado
+            - Modificado
+        Descripcion:
+          type: string
+          description: Descripción de la versión del presupuesto
+          example: "Presupuesto autorizado para el 2018"
+        Fecha:
+          type: string
+          format: date
+          description: Fecha de publicación del presupuesto
+          example: "2017-12-31"
+        Actual:
+          type: boolean
+          description: Describe si la versión es la actual para el año especificado
+          example: true
+        ObjetoGasto:
+          type: boolean
+          description: Describe si está cargadas las partidas presupuestarias por Objeto de Gasto
+          example: true
+        ProgramaPresupuestal:
+          type: boolean
+          description: Describe si está cargados los montos presupuestados para cada programa presupuestal
+          example: true
+        Monto:
+          type: number
+          format: float
+          description: Monto total del presupuesto correspondiente, a valores corrientes
+      required:
+        - Id
+        - Estado
+        - Anio
+        - Tipo
+        - Descripcion
+        - Fecha
+        - Actual
+    UnidadPresupuestal:
+      type: object
+      additionalProperties: false
+      description: Información de las Unidades Presupuestales del estado.
+      properties:
+        Id: 
+          type: integer
+          description: "Id de la Unidad Presupuestal en la base de datos de #NuestroPresupuesto"
+          example: 1
+        Clave:
+          type: string
+          description: "Clave con la que se identifica a la Unidad Presupuestal en la Secretaría de Hacienda del estado correspondiente"
+          example: "001"
+        Nombre:
+          type: string
+          description: "Nombre con el que se identifica a la Unidad Presupuestal de acuerdo a la información publicada por la Secretaría de Hacienda del estado correspondiente"
+          example: "Despacho del Gobernador"
+        Estado:
+          type: integer
+          description: Id numérico del estado a la que pertenece la Unidad Presupuestal
+          example: 14
+        Monto:
+          type: number
+          format: double
+          description: Monto del presupuesto asignado a la Unidad Presupuestal para el periodo especificado
+          example: 7642174
+      required:
+        - Id
+        - Clave
+        - Nombre
+        - Estado
+    UnidadResponsable:
+      type: object
+      additionalProperties: false
+      description: Información de las Unidades Responsables del estado.
+      properties:
+        Id: 
+          type: integer
+          description: "Id de la Unidad Responsable en la base de datos de #NuestroPresupuesto"
+          example: 1
+        Clave:
+          type: string
+          description: "Clave de la Unidad Presupuestal y de la Unidad Responsable unidas por un guión medio con las que se identifican en la Secretaría de Hacienda del estado correspondiente"
+          example: "001-000"
+        Nombre:
+          type: string
+          description: "Nombre con el que se identifica a la Unidad Responsable de acuerdo a la información publicada por la Secretaría de Hacienda del estado correspondiente"
+          example: "Despacho del Gobernador"
+        UnidadPresupuestal:
+          type: integer
+          description: Id numérico del la Unidad Presupuestal a la que pertenece la Unidad Responsable
+          example: 1
+        OtrosNombres:
+          type: string
+          description: Otros nombres con los que se le conoce o se ha identificado históricamente a la Unidad Responsable
+        Monto:
+          type: number
+          format: double
+          description: Monto del presupuesto asignado a la Unidad Presupuestal para el periodo especificado
+          example: 7642174
+      required:
+        - Id
+        - Clave
+        - Nombre
+        - UnidadPresupuestal
+    CapituloGasto:
+      type: object
+      additionalProperties: false
+      description: Información de los Capítulos de Gasto de acuerdo a la información del Consejo Nacional de Armonización Contable (CONAC) y su presupuesto a montos corrientes.
+      properties:
+        Id: 
+          type: integer
+          description: "Id del Capítulo de Gasto en la base de datos de #NuestroPresupuesto"
+          example: 1
+        Clave:
+          type: string
+          description: "Clave del Capítulo de Gasto establecida por el Consejo Nacional de Armonización Contable (CONAC)"
+          example: "1000"
+        Nombre:
+          type: string
+          description: "Nombre con el que se identifica al Capítulo de Gasto de acuerdo a lo establecido por el Consejo Nacional de Armonización Contable (CONAC)"
+          example: "Servicios Personales"
+        Monto:
+          type: number
+          format: double
+          description: Monto del presupuesto asignado al Capítulo de Gasto para el periodo especificado
+          example: 7642174
+      required:
+        - Id
+        - Clave
+        - Nombre
+    ConceptoGeneral:
+      type: object
+      additionalProperties: false
+      description: Información de los Conceptos Generales de acuerdo a la información del Consejo Nacional de Armonización Contable (CONAC) y su presupuesto a montos corrientes.
+      properties:
+        Id: 
+          type: integer
+          description: "Id del Concepto General en la base de datos de #NuestroPresupuesto"
+          example: 1
+        Clave:
+          type: string
+          description: "Clave del Concepto General establecida por el Consejo Nacional de Armonización Contable (CONAC)"
+          example: "1100"
+        Nombre:
+          type: string
+          description: "Nombre con el que se identifica al Concepto General de acuerdo a lo establecido por el Consejo Nacional de Armonización Contable (CONAC)"
+          example: "Remuneraciones Al Personal De Caracter Permanente"
+        CapituloGasto:
+          type: integer
+          description: "Id del Capítulo de Gasto al que pertenece el Concepto General"
+          example: 1
+        Monto:
+          type: number
+          format: double
+          description: Monto del presupuesto asignado al Concepto General para el periodo especificado
+          example: 7642174
+      required:
+        - Id
+        - Clave
+        - Nombre
+        - CapituloGasto
+    PartidaGenerica:
+      type: object
+      additionalProperties: false
+      description: Información de las Partidas Genéricas de acuerdo a la información del Consejo Nacional de Armonización Contable (CONAC) y su presupuesto a montos corrientes.
+      properties:
+        Id: 
+          type: integer
+          description: "Id de la Partida Genérica en la base de datos de #NuestroPresupuesto"
+          example: 1
+        Clave:
+          type: string
+          description: "Clave de la Partida Genérica establecida por el Consejo Nacional de Armonización Contable (CONAC)"
+          example: "1110"
+        Nombre:
+          type: string
+          description: "Nombre con el que se identifica a la Partida Genérica de acuerdo a lo establecido por el Consejo Nacional de Armonización Contable (CONAC)"
+          example: "Dietas"
+        ConceptoGeneral:
+          type: integer
+          description: "Id del Concepto General al que pertenece la Partida Genérica"
+          example: 1
+        Monto:
+          type: number
+          format: double
+          description: Monto del presupuesto asignado a la Partida Genérica para el periodo especificado
+          example: 7642174
+      required:
+        - Id
+        - Clave
+        - Nombre
+        - ConceptoGeneral
+    ObjetoGasto:
+      type: object
+      additionalProperties: false
+      description: Información de los Objetos de Gasto de acuerdo a la información de la Secretaría de Hacienda del estado correspondiente y su presupuesto a montos corrientes.
+      properties:
+        Clave:
+          type: string
+          description: "Clave del Objeto de Gasto de acuerdo a lo establecido por la Secretaría de Hacienda del estado correspondiente."
+          example: "1321"
+        Nombre:
+          type: string
+          description: "Descripción del Objeto de Gasto de acuerdo a lo establecido por la Secretaría de Hacienda del estado correspondiente."
+          example: "Prima vacacional y dominical (Prima Vacacional De Carrera Magisterial)"
+        PartidaGenerica:
+          type: integer
+          description: "Id de la Partida Genérica al que pertenece el Objeto de Gasto"
+          example: 10
+        Monto:
+          type: number
+          format: double
+          description: Monto del presupuesto asignado al Objeto de Gasto para el periodo especificado
+          example: 7642174
+      required:
+        - Clave
+        - Nombre
+        - PartidaGenerica
+    ProgramaPresupuestal:
+      type: object
+      additionalProperties: false
+      description: Información de los Programas Presupuestales de acuerdo a la información de la Secretaría de Hacienda del estado correspondiente y su presupuesto a montos corrientes.
+      properties:
+        Id:
+          type: integer
+          description: 'Id del Programa Presupuestal en la base de datos de #NuestroPresupuesto'
+          example: 98
+        Clave:
+          type: string
+          description: 'Clave del Programa Presupuestal (Clave Unidad Responsable + "-" + Clave del Programa Presupuestal) de acuerdo a lo establecido por la Secretaría de Hacienda del estado correspondiente.'
+          example: "004-000-112"
+        Nombre:
+          type: string
+          description: "Nombre designado al Programa Presupuestal de acuerdo a lo establecido por la Secretaría de Hacienda del estado correspondiente."
+          example: "Impartición de la Educación Primaria"
+        UnidadResponsable:
+          type: integer
+          description: "Id de la Unidad Responsable que ejecuta el Programa Presupuestal"
+          example: 10
+        Monto:
+          type: number
+          format: double
+          description: Monto del presupuesto asignado al Programa Presupuestal para el periodo especificado
+          example: 15226613029
+      required:
+        - Id
+        - Clave
+        - Nombre
+        - UnidadResponsable
+    Indicador:
+      type: object
+      additionalProperties: false
+      description: Información de los Indicadores con los que se mide un Programa Presupuestal de acuerdo a la información de la Secretaría de Hacienda del estado correspondiente.
+      properties:
+        Id:
+          type: integer
+          description: 'Id del Indicador en la base de datos de #NuestroPresupuesto'
+          example: 618
+        IdMIR:
+          type: integer
+          description: 'Id del Indicador en la base de datos del MIR (Modelo de Indicadores de Resultados) del estado'
+          example: 25526
+        Nombre:
+          type: string
+          description: "Nombre del Indicador de acuerdo a lo publicado por la Secretaría de Hacienda del estado correspondiente."
+          example: "Posición en el Índice de Rezago Social"
+        Nivel:
+          type: string
+          description: "Nivel al que pertenece el Indicador"
+          example: "Fin"
+        Resumen:
+          type: string
+          description: "Resumen narrativo del Indicador"
+          example: "Contribuir a mejorar las condiciones de acceso efectivo a los derechos sociales, mediante el impulso de las capacidades de las personas y sus comunidades, reduciendo brechas de desigualdad, con un sentido de colectividad fortalecido que impulsa la movilidad social ascendente y con atención prioritaria para las personas y los grupos cuyos derechos han sido vulnerados de manera histórica y coyuntural en particular por la pandemia por COVID19."
+        Medios:
+          type: string
+          description: "Medios de verificación del Indicador"
+          example: "En el Sistema de Monitoreo de Indicadores del Desarrollo de Jalisco (MIDE Jalisco), para consulta abierta en https://seplan.app.jalisco.gob.mx/mide"
+        Supuesto:
+          type: string
+          description: "Circunstancias o condicionantes que tienen que cumplirse para que el Indicador se pueda medir"
+          example: "Las y los habitantes del estado de Jalisco asumen su compromiso de corresponsabilidad en el proceso de desarrollo social y acceso efectivo de sus derechos sociales."
+        Data:
+          type: object
+          description: "Datos adicionales del Indicador"
+          additionalProperties: true
+          example: {}        
+      required:
+        - Id
+        - IdMIR
+        - Nombre
+        - Nivel
+        - Resumen
+        - Medios
+        - Supuesto
+    Error:
+      type: object
+      description: Estructura de error para respuestas no exitosas.
+      additionalProperties: false
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+      required:
+        - code
+        - message
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: Authorization
+      description: "API Key para autenticar las peticiones. Debe ser proporcionada en el encabezado de la solicitud como `Authorization: Bearer <tu_api_key>`."
