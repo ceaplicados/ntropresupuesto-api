@@ -617,7 +617,7 @@ paths:
                       maxItems: 5000
         '404':
           description: No se encontró el código del estado proveído en la URL
-  /{Estado}/ObjetoDeGasto/{FiltroOg}:
+  /{Estado}/ObjetoDeGasto/{FiltroOG}:
     get:
       tags:
         - Datos estatales
@@ -794,7 +794,7 @@ components:
         pattern: '^[1-9][0-9]00$'
         maxLength: 4
     ClavePartidaGenericaParam:
-      name: ClaveConceptoGeneral
+      name: ClavePartidaGenerica
       in: path
       description: Filtro para especificar una clave de Partida Genérica, de Concepto General, o de Capítulo de Gasto
       required: true
