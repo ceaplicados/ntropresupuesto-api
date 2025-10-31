@@ -13,7 +13,7 @@ import ObjetosDeGasto from './ObjetosDeGasto.js';
 import ProgramasPresupuestales from './ProgramasPresupuestales.js';
 
 
-export default class Usuarios {
+export default class Cuadernos {
     renglonesCuaderno = new RenglonesCuaderno();
     aniosCuaderno = new AniosCuaderno();
     versionesPresupuesto=new VersionesPresupuesto();
