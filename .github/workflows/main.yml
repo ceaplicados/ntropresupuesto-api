@@ -1,29 +1,61 @@
-name: 'CI/CD'
-
+name: Deploy to AWS EC2
 on:
   push:
-    branches: [master, main]
-  pull_request:
-    branches: [master, main]
-
+    branches:
+      - main
 jobs:
-  lint_js:
-      name: Lint JavaScript Files
-      runs-on: ubuntu-latest
-
-      steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
-
-      - name: Install Node.js
-        uses: actions/setup-node@v4
-
-      - name: Install and Run Linter
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create .env file
         run: |
-          # This command finds all JavaScript files recursively and runs JSHint on them
-          npm init -y
-          npm install eslint-plugin-import eslint-plugin-n eslint-plugin-promise
-          find ./ -type f -name app.js -exec ./node_modules/.bin/eslint -c eslint.config.js {} +
-          find ./src -type f -name "*.js" -exec ./node_modules/.bin/eslint -c eslint.config.js {} +
-          find ./config -type f -name "*.js" -exec ./node_modules/.bin/eslint -c eslint.config.js {} +
-          echo "Linted all the js files successfully"
+          cat <<EOF > config.env
+          APP_PORT=${{ secrets.APP_PORT }}
+          DB_HOST=${{ secrets.BDD_HOST }}
+          DB_PORT=${{ secrets.BDD_PORT }}
+          DB_USER=${{ secrets.BDD_USER }}
+          DB_PASSWORD=${{ secrets.BDD_PASSWORD }}
+          DB_DATABASE=${{ secrets.BDD_DATABASE }}
+          GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}
+          SESSION_SECRET=${{ secrets.SESSION_SECRET }}
+          REFRESH_SECRET=${{ secrets.REFRESH_SECRET }}
+          EOF
+        
+      - name: Transfer config.env file via SCP
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          source: "config.env"
+          target: "/home/ec2-user/ntropresupuesto/ntropresupuesto-api/config/"
+
+      - name: Create .cors file
+        run: |
+          cat <<EOF > cors.ts
+          ${{ secrets.CORS }}
+          EOF
+
+      - name: Transfer .cors file via SCP
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          source: "cors.ts"
+          target: "/home/ec2-user/ntropresupuesto/ntropresupuesto-api/config/"
+
+      - name: EC2 deploy
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            cd /home/ec2-user/ntropresupuesto
+            export NODE_OPTIONS=--max-old-space-size=4096
+            gh repo sync
+            cd /home/ec2-user/ntropresupuesto/ntropresupuesto-api
+            npm install
+            npm run build
+            pm2 restart 1
