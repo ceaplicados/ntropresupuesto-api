@@ -57,5 +57,4 @@ jobs:
             gh repo sync
             cd /home/ec2-user/ntropresupuesto/ntropresupuesto-api
             npm install
-            npm run build
             pm2 restart 1
