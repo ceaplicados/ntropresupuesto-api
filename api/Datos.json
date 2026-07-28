@@ -9,10 +9,15 @@
     {
         "dataset": "/INPC",
         "descripcion": "Valores anuales del INPC",
-        "version": 1.1,
-        "lastUpdate": "2025-08-11",
+        "version": 1.2,
+        "lastUpdate": "2026-07-28",
         "fuentes": "INEGI, y Paquete Económico",
         "versiones": [
+            {
+                "version": 1.2,
+                "fecha": "2026-07-28",
+                "descripcion": "Se añade el INPC del 2025 y la previsión del 2026 publicada en el paquete económico"
+            },
             {
                 "version": 1.1,
                 "fecha": "2025-10-31",
