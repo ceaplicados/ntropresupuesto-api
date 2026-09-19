@@ -30,5 +30,10 @@
     "scripts": {
         "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js --detectOpenHandles --forceExit",
         "validate-api": "lint-openapi --config ./openapi.yaml"
+    },
+    "overrides": {
+        "gaxios": {
+            "uuid": "^11.1.1"
+        }
     }
 }
