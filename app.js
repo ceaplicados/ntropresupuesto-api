@@ -65,7 +65,15 @@ app.use(loginOptional,function auth(req, res, next) {
     next(); // Proceed to the next middleware
 })
 
-app.get("/Datos",(req,res)=>{
+// Los datasets estáticos (sobre todo las previsiones del INPC) pueden cambiar en
+// cualquier momento del año. Con no-cache el navegador siempre revalida, y gracias
+// al ETag que genera Express la respuesta es un 304 vacío si el archivo no cambió.
+const revalidarSiempre = (req, res, next) => {
+    res.set('Cache-Control', 'no-cache');
+    next();
+}
+
+app.get("/Datos",revalidarSiempre,(req,res)=>{
     fs.readFile("./api/Datos.json","utf8")
     .then((data) => {
         res.setHeader('Content-Type', 'application/json');
@@ -77,7 +85,7 @@ app.get("/Datos",(req,res)=>{
     })
 });
 
-app.get("/Estados",(req,res)=>{
+app.get("/Estados",revalidarSiempre,(req,res)=>{
     fs.readFile("./api/Estados.json","utf8")
     .then((data) => {
         res.setHeader('Content-Type', 'application/json');
@@ -89,7 +97,7 @@ app.get("/Estados",(req,res)=>{
     })
 });
 
-app.get("/INPC",(req,res)=>{
+app.get("/INPC",revalidarSiempre,(req,res)=>{
     fs.readFile("./api/INPC.json","utf8")
     .then((data) => {
         res.setHeader('Content-Type', 'application/json');
